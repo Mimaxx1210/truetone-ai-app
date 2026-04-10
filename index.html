@@ -512,7 +512,11 @@
         }
 
         try {
-          const pollRes = await fetch(`${API_URL}?job_id=${jobId}`);
+          const pollRes = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ job_id: jobId })
+          });
           const pollData = await pollRes.json();
 
           if (pollData.status === 'done') {
