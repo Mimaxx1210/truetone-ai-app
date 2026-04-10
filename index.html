@@ -65,6 +65,22 @@
   }
   .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #7cb87a; }
 
+  /* FIX — reset button géré uniquement par cette classe */
+  #resetBtn {
+    display: none; /* caché par défaut */
+    margin-left: 16px;
+    background: none; border: none;
+    padding: 6px 10px;
+    font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 400;
+    letter-spacing: 0.03em; color: var(--gold);
+    cursor: pointer; transition: all 0.2s;
+    align-items: center; gap: 7px;
+  }
+  #resetBtn:hover { color: var(--gold-light); }
+  #resetBtn:hover svg { transform: rotate(-30deg); }
+  #resetBtn svg { transition: transform 0.3s ease; flex-shrink: 0; }
+  #resetBtn.visible { display: flex; }
+
   /* GATE */
   #gate {
     flex: 1; display: flex; align-items: center;
@@ -276,7 +292,15 @@
   <div class="header-right">
     <div class="status-dot"></div>
     Beta
-    <button id="resetBtn" onclick="resetChat()" style="display:none;margin-left:16px;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-family:Jost,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">Nouvelle conversation</button>
+    <!-- FIX : géré uniquement par la classe .visible, plus de style inline -->
+    <button id="resetBtn" onclick="resetChat()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+      Nouvelle conversation
+    </button>
   </div>
 </header>
 
@@ -301,7 +325,7 @@
       <div class="divider"></div>
       <div class="suggestions">
         <div class="chip" onclick="sendSuggestion('Comment trouver mon sous-ton ?')">Mon sous-ton 🎨</div>
-        <div class="chip" onclick="sendSuggestion('Je cherche un fond de teint pour peau ébène warm')">Fond de teint 💄</div>
+        <div class="chip" onclick="sendSuggestion('Je cherche un fond de teint pour peau ébène warm')">Fond de teint ✨</div>
         <div class="chip" onclick="sendSuggestion('Quelle poudre évite le flashback ?')">Anti-flashback ⚡</div>
         <div class="chip" onclick="sendSuggestion('Mon fond de teint vire orange, pourquoi ?')">Oxydation 🔶</div>
       </div>
@@ -332,65 +356,88 @@
     const err = document.getElementById('gateError');
     if (!email || !email.includes('@') || !email.includes('.')) {
       err.textContent = "Merci d'entrer un email valide.";
-      err.style.display = 'block'; return;
+      err.style.display = 'block';
+      return;
     }
-    userEmail = email; sessionId = generateSessionId();
+    userEmail = email;
+    sessionId = generateSessionId();
     document.getElementById('gate').style.display = 'none';
     document.getElementById('chat').style.display = 'flex';
     document.getElementById('userEmailDisplay').textContent = email;
-    document.getElementById('resetBtn').style.display = 'block';
-  document.getElementById('msgInput').focus();
-  }
-
-  function resetChat() {
-    sessionId = generateSessionId();
-    const msgs = document.getElementById('messages');
-    msgs.innerHTML = `<div class="welcome-screen" id="welcomeMsg">
-      <span class="crown">💄</span>
-      <h3>Je suis <em>Rosy</em></h3>
-      <p>Experte en teint, fonds de teint et poudres pour peaux noires et métissées. Pose-moi ta question.</p>
-      <div class="divider"></div>
-      <div class="suggestions">
-        <div class="chip" onclick="sendSuggestion('Comment trouver mon sous-ton ?')">Mon sous-ton 🎨</div>
-        <div class="chip" onclick="sendSuggestion('Je cherche un fond de teint pour peau ébène warm')">Fond de teint 💄</div>
-        <div class="chip" onclick="sendSuggestion('Quelle poudre évite le flashback ?')">Anti-flashback ⚡</div>
-        <div class="chip" onclick="sendSuggestion('Mon fond de teint vire orange, pourquoi ?')">Oxydation 🔶</div>
-      </div>
-    </div>`;
+    // FIX : utilisation de la classe .visible uniquement
+    document.getElementById('resetBtn').classList.add('visible');
     document.getElementById('msgInput').focus();
   }
 
-  document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') startChat(); });
-
-  function sendSuggestion(text) {
-    const w = document.getElementById('welcomeMsg'); if (w) w.remove();
-    document.getElementById('msgInput').value = text; sendMessage();
+  // FIX : une seule déclaration de resetChat()
+  function resetChat() {
+    sessionId = generateSessionId();
+    const msgs = document.getElementById('messages');
+    msgs.innerHTML = `
+      <div class="welcome-screen" id="welcomeMsg">
+        <span class="crown">💄</span>
+        <h3>Je suis <em>Rosy</em></h3>
+        <p>Experte en teint, fonds de teint et poudres pour peaux noires et métissées. Pose-moi ta question.</p>
+        <div class="divider"></div>
+        <div class="suggestions">
+          <div class="chip" onclick="sendSuggestion('Comment trouver mon sous-ton ?')">Mon sous-ton 🎨</div>
+          <div class="chip" onclick="sendSuggestion('Je cherche un fond de teint pour peau ébène warm')">Fond de teint ✨</div>
+          <div class="chip" onclick="sendSuggestion('Quelle poudre évite le flashback ?')">Anti-flashback ⚡</div>
+          <div class="chip" onclick="sendSuggestion('Mon fond de teint vire orange, pourquoi ?')">Oxydation 🔶</div>
+        </div>
+      </div>`;
+    document.getElementById('msgInput').focus();
   }
 
-  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+  document.getElementById('emailInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startChat();
+  });
 
-  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+  function sendSuggestion(text) {
+    const w = document.getElementById('welcomeMsg');
+    if (w) w.remove();
+    document.getElementById('msgInput').value = text;
+    sendMessage();
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
 
   function addMessage(role, content) {
-    const w = document.getElementById('welcomeMsg'); if (w) w.remove();
+    const w = document.getElementById('welcomeMsg');
+    if (w) w.remove();
     const msgs = document.getElementById('messages');
-    const div = document.createElement('div'); div.className = `msg ${role}`;
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
     if (role === 'rosy') {
       div.innerHTML = `<div class="msg-avatar">💄</div><div class="msg-bubble">${formatMessage(content)}</div>`;
     } else {
       div.innerHTML = `<div class="msg-bubble">${escapeHtml(content)}</div>`;
     }
-    msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
   function showTyping() {
     const msgs = document.getElementById('messages');
-    const div = document.createElement('div'); div.className = 'typing-indicator'; div.id = 'typing';
+    const div = document.createElement('div');
+    div.className = 'typing-indicator';
+    div.id = 'typing';
     div.innerHTML = `<div class="msg-avatar">💄</div><div class="typing-dots"><span></span><span></span><span></span></div>`;
-    msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function hideTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+  function hideTyping() {
+    const t = document.getElementById('typing');
+    if (t) t.remove();
+  }
 
   function formatMessage(text) {
     let h = escapeHtml(text);
@@ -414,16 +461,29 @@
   async function sendMessage() {
     if (isLoading) return;
     const input = document.getElementById('msgInput');
-    const message = input.value.trim(); if (!message) return;
-    input.value = ''; input.style.height = 'auto';
-    isLoading = true; document.getElementById('sendBtn').disabled = true;
-    addMessage('user', message); showTyping();
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = '';
+    input.style.height = 'auto';
+    isLoading = true;
+    document.getElementById('sendBtn').disabled = true;
+    addMessage('user', message);
+    showTyping();
+
+    // FIX : timeout de 30 secondes via AbortController
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
       const res = await fetch(API_URL, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, message, session_id: sessionId })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, message, session_id: sessionId }),
+        signal: controller.signal
       });
-      const data = await res.json(); hideTyping();
+      clearTimeout(timeoutId);
+      const data = await res.json();
+      hideTyping();
       if (res.ok && data.response) {
         addMessage('rosy', data.response);
       } else if (res.status === 403) {
@@ -432,29 +492,17 @@
         addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
       }
     } catch(e) {
+      clearTimeout(timeoutId);
       hideTyping();
-      addMessage('rosy', "Impossible de me joindre pour l'instant. Vérifie ta connexion.");
+      if (e.name === 'AbortError') {
+        addMessage('rosy', "La réponse prend trop de temps. Réessaie dans quelques instants ⏳");
+      } else {
+        addMessage('rosy', "Impossible de me joindre pour l'instant. Vérifie ta connexion.");
+      }
     }
-    isLoading = false; document.getElementById('sendBtn').disabled = false;
-    document.getElementById('resetBtn').style.display = 'block';
-  document.getElementById('msgInput').focus();
-  }
 
-  function resetChat() {
-    sessionId = generateSessionId();
-    const msgs = document.getElementById('messages');
-    msgs.innerHTML = `<div class="welcome-screen" id="welcomeMsg">
-      <span class="crown">💄</span>
-      <h3>Je suis <em>Rosy</em></h3>
-      <p>Experte en teint, fonds de teint et poudres pour peaux noires et métissées. Pose-moi ta question.</p>
-      <div class="divider"></div>
-      <div class="suggestions">
-        <div class="chip" onclick="sendSuggestion('Comment trouver mon sous-ton ?')">Mon sous-ton 🎨</div>
-        <div class="chip" onclick="sendSuggestion('Je cherche un fond de teint pour peau ébène warm')">Fond de teint 💄</div>
-        <div class="chip" onclick="sendSuggestion('Quelle poudre évite le flashback ?')">Anti-flashback ⚡</div>
-        <div class="chip" onclick="sendSuggestion('Mon fond de teint vire orange, pourquoi ?')">Oxydation 🔶</div>
-      </div>
-    </div>`;
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
     document.getElementById('msgInput').focus();
   }
 </script>
