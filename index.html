@@ -470,40 +470,81 @@
     addMessage('user', message);
     showTyping();
 
-    // FIX : timeout de 30 secondes via AbortController
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 90000);
-
     try {
+      // Étape 1 : envoyer la requête, recevoir job_id instantanément
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, message, session_id: sessionId }),
-        signal: controller.signal
+        body: JSON.stringify({ email: userEmail, message, session_id: sessionId })
       });
-      clearTimeout(timeoutId);
-      const data = await res.json();
-      hideTyping();
-      if (res.ok && data.response) {
-        addMessage('rosy', data.response);
-      } else if (res.status === 403) {
-        addMessage('rosy', "Ton email n'est pas encore dans la liste bêta. Contacte-nous pour rejoindre TrueTone AI ✨");
-      } else {
-        addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
-      }
-    } catch(e) {
-      clearTimeout(timeoutId);
-      hideTyping();
-      if (e.name === 'AbortError') {
-        addMessage('rosy', "La réponse prend trop de temps. Réessaie dans quelques instants ⏳");
-      } else {
-        addMessage('rosy', "Impossible de me joindre pour l'instant. Vérifie ta connexion.");
-      }
-    }
 
-    isLoading = false;
-    document.getElementById('sendBtn').disabled = false;
-    document.getElementById('msgInput').focus();
+      const data = await res.json();
+
+      if (res.status === 403) {
+        hideTyping();
+        addMessage('rosy', "Ton email n'est pas encore dans la liste bêta. Contacte-nous pour rejoindre TrueTone AI ✨");
+        isLoading = false;
+        document.getElementById('sendBtn').disabled = false;
+        return;
+      }
+
+      if (!res.ok || !data.job_id) {
+        hideTyping();
+        addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
+        isLoading = false;
+        document.getElementById('sendBtn').disabled = false;
+        return;
+      }
+
+      // Étape 2 : poll toutes les 2s jusqu'à status done
+      const jobId = data.job_id;
+      let attempts = 0;
+      const maxAttempts = 45; // 90 secondes max
+
+      const poll = async () => {
+        attempts++;
+        if (attempts > maxAttempts) {
+          hideTyping();
+          addMessage('rosy', "La réponse prend plus de temps que prévu. Réessaie dans quelques instants ⏳");
+          isLoading = false;
+          document.getElementById('sendBtn').disabled = false;
+          return;
+        }
+
+        try {
+          const pollRes = await fetch(`${API_URL}?job_id=${jobId}`);
+          const pollData = await pollRes.json();
+
+          if (pollData.status === 'done') {
+            hideTyping();
+            // Mise à jour du session_id pour la continuité de la conversation
+            if (pollData.session_id) sessionId = pollData.session_id;
+            addMessage('rosy', pollData.response);
+            isLoading = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('msgInput').focus();
+          } else if (pollData.status === 'error') {
+            hideTyping();
+            addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
+            isLoading = false;
+            document.getElementById('sendBtn').disabled = false;
+          } else {
+            // Encore pending, on recheck dans 2s
+            setTimeout(poll, 2000);
+          }
+        } catch(e) {
+          setTimeout(poll, 2000);
+        }
+      };
+
+      setTimeout(poll, 2000);
+
+    } catch(e) {
+      hideTyping();
+      addMessage('rosy', "Impossible de me joindre pour l'instant. Vérifie ta connexion.");
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+    }
   }
 </script>
 </body>
