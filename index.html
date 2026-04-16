@@ -65,9 +65,8 @@
   }
   .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #7cb87a; }
 
-  /* FIX — reset button géré uniquement par cette classe */
   #resetBtn {
-    display: none; /* caché par défaut */
+    display: none;
     margin-left: 16px;
     background: none; border: none;
     padding: 6px 10px;
@@ -273,6 +272,40 @@
   }
   .chip:hover { border-color: var(--gold-light); color: var(--gold); background: var(--gold-pale); }
 
+  /* ANALYZE SKIN */
+  .scan-btn {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+    transition: all 0.2s; color: var(--text-muted);
+  }
+  .scan-btn:hover { border-color: var(--gold-light); color: var(--gold); background: var(--gold-pale); }
+  .scan-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+  .consent-banner {
+    background: var(--gold-pale); border: 1px solid var(--gold-line);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+    font-size: 13px; color: var(--text-mid); line-height: 1.6;
+    display: none; animation: fadeSlide 0.3s ease;
+  }
+  .consent-banner.visible { display: block; }
+  .consent-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .consent-ok {
+    background: linear-gradient(135deg, var(--gold), var(--rosy-accent));
+    color: white; border: none; border-radius: 8px;
+    padding: 7px 16px; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+    font-family: 'Jost', sans-serif;
+  }
+  .consent-cancel {
+    background: none; border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 14px;
+    font-size: 12px; color: var(--text-muted); cursor: pointer;
+    font-family: 'Jost', sans-serif;
+  }
+  #fileInput { display: none; }
+
   @media (max-width: 480px) {
     .gate-card { padding: 40px 28px; }
     header { padding: 16px 20px; }
@@ -292,7 +325,6 @@
   <div class="header-right">
     <div class="status-dot"></div>
     Beta
-    <!-- FIX : géré uniquement par la classe .visible, plus de style inline -->
     <button id="resetBtn" onclick="resetChat()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -333,7 +365,29 @@
   </div>
   <div class="input-area">
     <div class="user-info">Session · <span id="userEmailDisplay"></span></div>
+
+    <!-- CONSENT BANNER RGPD -->
+    <div id="consentBanner" class="consent-banner">
+      📸 <strong>Analyse photo</strong> — Rosy va analyser ton teint pour personnaliser ses recommandations.
+      Ta photo est traitée en temps réel et <strong>jamais stockée</strong>.
+      <div class="consent-actions">
+        <button class="consent-ok" onclick="consentAccepted()">J'accepte</button>
+        <button class="consent-cancel" onclick="consentDismiss()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- FILE INPUT CACHÉ -->
+    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelected(event)">
+
     <div class="input-row">
+      <!-- BOUTON SCAN -->
+      <button class="scan-btn" id="scanBtn" onclick="requestScan()" title="Scanner ma peau">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </button>
       <textarea id="msgInput" placeholder="Pose ta question à Rosy…" rows="1"
         onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()">
@@ -345,6 +399,7 @@
 
 <script>
   const API_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/chat';
+  const ANALYZE_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/analyze-skin';
   let userEmail = '', sessionId = '', isLoading = false;
 
   function generateSessionId() {
@@ -364,12 +419,10 @@
     document.getElementById('gate').style.display = 'none';
     document.getElementById('chat').style.display = 'flex';
     document.getElementById('userEmailDisplay').textContent = email;
-    // FIX : utilisation de la classe .visible uniquement
     document.getElementById('resetBtn').classList.add('visible');
     document.getElementById('msgInput').focus();
   }
 
-  // FIX : une seule déclaration de resetChat()
   function resetChat() {
     sessionId = generateSessionId();
     const msgs = document.getElementById('messages');
@@ -418,10 +471,11 @@
     if (role === 'rosy') {
       div.innerHTML = `<div class="msg-avatar">💄</div><div class="msg-bubble">${formatMessage(content)}</div>`;
     } else {
-      div.innerHTML = `<div class="msg-bubble">${escapeHtml(content)}</div>`;
+      div.innerHTML = `<div class="msg-bubble">${formatMessage(content)}</div>`;
     }
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
+    return div;
   }
 
   function showTyping() {
@@ -437,6 +491,12 @@
   function hideTyping() {
     const t = document.getElementById('typing');
     if (t) t.remove();
+  }
+
+  function setLoading(state) {
+    isLoading = state;
+    document.getElementById('sendBtn').disabled = state;
+    document.getElementById('scanBtn').disabled = state;
   }
 
   function formatMessage(text) {
@@ -458,6 +518,38 @@
     return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ─── POLL GÉNÉRIQUE ───────────────────────────────────────────────────────
+  function pollJob(jobId, onDone, onError) {
+    let attempts = 0;
+    const poll = async () => {
+      attempts++;
+      if (attempts > 45) {
+        onError('timeout');
+        return;
+      }
+      try {
+        const pollRes = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ job_id: jobId })
+        });
+        const pollData = await pollRes.json();
+        if (pollData.status === 'done') {
+          if (pollData.session_id) sessionId = pollData.session_id;
+          onDone(pollData.response);
+        } else if (pollData.status === 'error') {
+          onError('error');
+        } else {
+          setTimeout(poll, 2000);
+        }
+      } catch(e) {
+        setTimeout(poll, 2000);
+      }
+    };
+    setTimeout(poll, 2000);
+  }
+
+  // ─── ENVOI MESSAGE STANDARD ───────────────────────────────────────────────
   async function sendMessage() {
     if (isLoading) return;
     const input = document.getElementById('msgInput');
@@ -465,89 +557,150 @@
     if (!message) return;
     input.value = '';
     input.style.height = 'auto';
-    isLoading = true;
-    document.getElementById('sendBtn').disabled = true;
+    setLoading(true);
     addMessage('user', message);
     showTyping();
 
     try {
-      // Étape 1 : envoyer la requête, recevoir job_id instantanément
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, message, session_id: sessionId })
       });
-
       const data = await res.json();
 
       if (res.status === 403) {
         hideTyping();
         addMessage('rosy', "Ton email n'est pas encore dans la liste bêta. Contacte-nous pour rejoindre TrueTone AI ✨");
-        isLoading = false;
-        document.getElementById('sendBtn').disabled = false;
+        setLoading(false);
         return;
       }
-
       if (!res.ok || !data.job_id) {
         hideTyping();
         addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
-        isLoading = false;
-        document.getElementById('sendBtn').disabled = false;
+        setLoading(false);
         return;
       }
 
-      // Étape 2 : poll toutes les 2s jusqu'à status done
-      const jobId = data.job_id;
-      let attempts = 0;
-      const maxAttempts = 45; // 90 secondes max
-
-      const poll = async () => {
-        attempts++;
-        if (attempts > maxAttempts) {
+      pollJob(
+        data.job_id,
+        (response) => {
           hideTyping();
-          addMessage('rosy', "La réponse prend plus de temps que prévu. Réessaie dans quelques instants ⏳");
-          isLoading = false;
-          document.getElementById('sendBtn').disabled = false;
-          return;
+          addMessage('rosy', response);
+          setLoading(false);
+          document.getElementById('msgInput').focus();
+        },
+        (type) => {
+          hideTyping();
+          const msg = type === 'timeout'
+            ? "La réponse prend plus de temps que prévu. Réessaie dans quelques instants ⏳"
+            : "Une erreur est survenue. Réessaie dans quelques instants.";
+          addMessage('rosy', msg);
+          setLoading(false);
         }
-
-        try {
-          const pollRes = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ job_id: jobId })
-          });
-          const pollData = await pollRes.json();
-
-          if (pollData.status === 'done') {
-            hideTyping();
-            // Mise à jour du session_id pour la continuité de la conversation
-            if (pollData.session_id) sessionId = pollData.session_id;
-            addMessage('rosy', pollData.response);
-            isLoading = false;
-            document.getElementById('sendBtn').disabled = false;
-            document.getElementById('msgInput').focus();
-          } else if (pollData.status === 'error') {
-            hideTyping();
-            addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
-            isLoading = false;
-            document.getElementById('sendBtn').disabled = false;
-          } else {
-            // Encore pending, on recheck dans 2s
-            setTimeout(poll, 2000);
-          }
-        } catch(e) {
-          setTimeout(poll, 2000);
-        }
-      };
-
-      setTimeout(poll, 2000);
+      );
 
     } catch(e) {
       hideTyping();
       addMessage('rosy', "Impossible de me joindre pour l'instant. Vérifie ta connexion.");
-      isLoading = false;
-      document.getElementById('sendBtn').disabled = false;
+      setLoading(false);
+    }
+  }
+
+  // ─── ANALYZE SKIN ─────────────────────────────────────────────────────────
+  function requestScan() {
+    if (isLoading) return;
+    document.getElementById('consentBanner').classList.add('visible');
+  }
+
+  function consentDismiss() {
+    document.getElementById('consentBanner').classList.remove('visible');
+  }
+
+  function consentAccepted() {
+    document.getElementById('consentBanner').classList.remove('visible');
+    document.getElementById('fileInput').click();
+  }
+
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleFileSelected(event) {
+    const file = event.target.files[0];
+    event.target.value = ''; // reset pour re-sélection possible
+    if (!file) return;
+
+    setLoading(true);
+    const pendingMsg = addMessage('user', '📸 Analyse de ma photo en cours…');
+    showTyping();
+
+    try {
+      const base64 = await toBase64(file);
+
+      const res = await fetch(ANALYZE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_base64: base64 })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        hideTyping();
+        const msg = data.error === 'no_face'
+          ? "Je n'ai pas détecté de visage sur cette photo. Essaie avec un selfie en lumière naturelle 🌿"
+          : "Je n'ai pas pu analyser cette photo. Réessaie avec une meilleure lumière.";
+        addMessage('rosy', msg);
+        setLoading(false);
+        return;
+      }
+
+      // Message visible côté utilisatrice avec le résultat
+      const confLabels = { high: 'élevée', medium: 'moyenne', low: 'faible' };
+      const analysisMsg = `Mon analyse photo 📸 : carnation **${data.carnation}**, sous-ton **${data.undertone}** (confiance : ${confLabels[data.confidence] || data.confidence})`;
+
+      // Mise à jour du message "en cours" avec le résultat réel
+      pendingMsg.querySelector('.msg-bubble').innerHTML = formatMessage(analysisMsg);
+
+      // Envoi à Rosy
+      const sendRes = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, message: analysisMsg, session_id: sessionId })
+      });
+      const sendData = await sendRes.json();
+
+      if (!sendRes.ok || !sendData.job_id) {
+        hideTyping();
+        addMessage('rosy', "Une erreur est survenue. Réessaie.");
+        setLoading(false);
+        return;
+      }
+
+      pollJob(
+        sendData.job_id,
+        (response) => {
+          hideTyping();
+          addMessage('rosy', response);
+          setLoading(false);
+          document.getElementById('msgInput').focus();
+        },
+        () => {
+          hideTyping();
+          addMessage('rosy', "La réponse prend plus de temps que prévu. Réessaie ⏳");
+          setLoading(false);
+        }
+      );
+
+    } catch(e) {
+      hideTyping();
+      addMessage('rosy', "Une erreur est survenue lors de l'analyse. Réessaie.");
+      setLoading(false);
     }
   }
 </script>
