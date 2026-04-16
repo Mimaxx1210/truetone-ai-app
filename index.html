@@ -523,7 +523,7 @@
     let attempts = 0;
     const poll = async () => {
       attempts++;
-      if (attempts > 45) {
+      if (attempts > 75) {
         onError('timeout');
         return;
       }
