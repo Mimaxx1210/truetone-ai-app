@@ -344,7 +344,6 @@
     <input class="input-field" type="email" id="emailInput" placeholder="ton@email.com" autocomplete="email" />
     <button class="btn-primary" onclick="startChat()">Accéder à Rosy</button>
     <p class="gate-error" id="gateError"></p>
-    <div class="gate-tagline">Accès bêta sur invitation</div>
   </div>
 </div>
 
@@ -569,12 +568,6 @@
       });
       const data = await res.json();
 
-      if (res.status === 403) {
-        hideTyping();
-        addMessage('rosy', "Ton email n'est pas encore dans la liste bêta. Contacte-nous à l'adresse : contact@truetoneai.app pour rejoindre la beta ✨");
-        setLoading(false);
-        return;
-      }
       if (!res.ok || !data.job_id) {
         hideTyping();
         addMessage('rosy', "Une erreur est survenue. Réessaie dans quelques instants.");
