@@ -234,6 +234,20 @@
     margin-bottom: 12px; letter-spacing: 0.06em; text-transform: uppercase;
   }
   .user-info span { color: var(--bordeaux); }
+  .user-info a {
+    color: var(--chocolat-muted); text-decoration: underline;
+    text-decoration-color: var(--border); transition: color 0.2s;
+  }
+  .user-info a:hover { color: var(--bordeaux); }
+  .gate-legal {
+    margin-top: 24px; font-size: 12px; color: var(--chocolat-muted);
+    letter-spacing: 0.04em;
+  }
+  .gate-legal a {
+    color: var(--chocolat-muted); text-decoration: underline;
+    text-decoration-color: var(--border); transition: color 0.2s;
+  }
+  .gate-legal a:hover { color: var(--bordeaux); }
   .input-row {
     display: flex; gap: 10px; align-items: flex-end;
     background: var(--surface2); border: 1px solid var(--border);
@@ -368,6 +382,11 @@
     <input class="input-field" type="email" id="emailInput" placeholder="ton@email.com" autocomplete="email" />
     <button class="btn-primary" onclick="startChat()">Accéder à Rosy</button>
     <p class="gate-error" id="gateError"></p>
+    <div class="gate-legal">
+      <a href="https://rosy-legal.netlify.app/confidentialite" target="_blank" rel="noopener">Confidentialité</a>
+      &nbsp;·&nbsp;
+      <a href="https://rosy-legal.netlify.app/suppression-compte" target="_blank" rel="noopener">Supprimer mon compte</a>
+    </div>
   </div>
 </div>
 
@@ -387,7 +406,9 @@
     </div>
   </div>
   <div class="input-area">
-    <div class="user-info">Session · <span id="userEmailDisplay"></span></div>
+    <div class="user-info">Session · <span id="userEmailDisplay"></span> ·
+      <a href="https://rosy-legal.netlify.app/suppression-compte" target="_blank" rel="noopener">Supprimer mon compte</a>
+    </div>
 
     <!-- CONSENT BANNER RGPD -->
     <div id="consentBanner" class="consent-banner">
