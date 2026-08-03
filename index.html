@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TrueTone AI — Rosy</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
     /* Palette éditorial boudoir */
@@ -119,6 +120,18 @@
     color: var(--chocolat-mid); font-size: 14px; font-weight: 300;
     line-height: 1.7; margin-bottom: 36px; letter-spacing: 0.01em;
   }
+  .google-slot {
+    display: flex; justify-content: center; margin-bottom: 22px;
+    min-height: 44px;
+  }
+  .gate-sep {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 22px; color: var(--chocolat-muted);
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .gate-sep::before, .gate-sep::after {
+    content: ''; flex: 1; height: 1px; background: var(--border-light);
+  }
   .input-field {
     width: 100%; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 14px; padding: 15px 20px;
@@ -144,7 +157,16 @@
   }
   .btn-primary:hover { background: var(--bordeaux); box-shadow: 0 6px 24px rgba(139, 58, 58, 0.35); }
   .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
   .gate-error { color: var(--bordeaux); font-size: 13px; margin-top: 12px; display: none; }
+  .gate-info {
+    color: var(--chocolat-mid); font-size: 13px; margin-top: 14px;
+    line-height: 1.6; display: none;
+  }
+  .gate-loading {
+    color: var(--chocolat-muted); font-size: 13px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
   .gate-tagline {
     margin-top: 28px; font-size: 12px; color: var(--chocolat-muted);
     letter-spacing: 0.06em; text-transform: uppercase;
@@ -378,10 +400,19 @@
   <div class="gate-card">
     <div class="gate-avatar">💄</div>
     <h2>Hello, je suis <em>Rosy</em></h2>
-    <p>Ton experte beauté dédiée aux peaux noires et métissées. Entre ton email pour accéder à l'expérience.</p>
-    <input class="input-field" type="email" id="emailInput" placeholder="ton@email.com" autocomplete="email" />
-    <button class="btn-primary" onclick="startChat()">Accéder à Rosy</button>
+    <p>Ton experte beauté dédiée aux peaux noires et métissées. Connecte-toi pour accéder à l'expérience.</p>
+
+    <div id="gateLoading" class="gate-loading">Un instant…</div>
+
+    <div id="gateForms" style="display:none">
+      <div class="google-slot" id="googleBtn"></div>
+      <div class="gate-sep">ou</div>
+      <input class="input-field" type="email" id="emailInput" placeholder="ton@email.com" autocomplete="email" />
+      <button class="btn-primary" id="magicBtn" onclick="requestMagicLink()">Recevoir mon lien de connexion</button>
+    </div>
+
     <p class="gate-error" id="gateError"></p>
+    <p class="gate-info" id="gateInfo"></p>
     <div class="gate-legal">
       <a href="https://rosy-legal.netlify.app/confidentialite" target="_blank" rel="noopener">Confidentialité</a>
       &nbsp;·&nbsp;
@@ -407,6 +438,7 @@
   </div>
   <div class="input-area">
     <div class="user-info">Session · <span id="userEmailDisplay"></span> ·
+      <a href="#" onclick="logout(); return false;">Se déconnecter</a> ·
       <a href="https://rosy-legal.netlify.app/suppression-compte" target="_blank" rel="noopener">Supprimer mon compte</a>
     </div>
 
@@ -444,20 +476,41 @@
 <script>
   const API_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/chat';
   const ANALYZE_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/analyze-skin';
+  const AUTH_BASE = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/auth';
+  const GOOGLE_CLIENT_ID = '214461444330-ff08g71g6d5q5jj33gh6885ljtrrsnuf.apps.googleusercontent.com';
+  const SESSION_KEY = 'rosy_session';
   let userEmail = '', sessionId = '', isLoading = false;
 
-  function generateSessionId() {
-    return 'sess-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  // ─── SESSION (localStorage) ───────────────────────────────────────────────
+  function getSession() { return localStorage.getItem(SESSION_KEY) || ''; }
+  function setSession(t) { localStorage.setItem(SESSION_KEY, t); }
+  function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+  function logout() {
+    clearSession();
+    window.location.reload();
   }
 
-  function startChat() {
-    const email = document.getElementById('emailInput').value.trim().toLowerCase().replace(/\s+/g, '');
+  // ─── AFFICHAGE GATE / CHAT ────────────────────────────────────────────────
+  function showGateForms() {
+    document.getElementById('gateLoading').style.display = 'none';
+    document.getElementById('gateForms').style.display = 'block';
+    initGoogleButton();
+  }
+
+  function showGateError(msg) {
     const err = document.getElementById('gateError');
-    if (!email || !email.includes('@') || !email.includes('.')) {
-      err.textContent = "Merci d'entrer un email valide.";
-      err.style.display = 'block';
-      return;
-    }
+    err.textContent = msg;
+    err.style.display = 'block';
+  }
+
+  function showGateInfo(msg) {
+    const info = document.getElementById('gateInfo');
+    info.textContent = msg;
+    info.style.display = 'block';
+  }
+
+  function openChat(email) {
     userEmail = email;
     sessionId = generateSessionId();
     document.getElementById('gate').style.display = 'none';
@@ -467,6 +520,128 @@
     document.getElementById('msgInput').focus();
   }
 
+  function generateSessionId() {
+    return 'sess-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // ─── DÉMARRAGE : token URL → session stockée → écran de connexion ────────
+  async function initAuth() {
+    // 1. Un token de lien magique dans l'URL ? (query ?token= ou fragment #magic=)
+    const params = new URLSearchParams(window.location.search);
+    let magic = params.get('token') || '';
+    if (!magic && window.location.hash.indexOf('#magic=') === 0) {
+      magic = decodeURIComponent(window.location.hash.slice(7));
+    }
+    if (magic) {
+      // Nettoyage immédiat : le token disparaît de la barre d'adresse et de l'historique.
+      history.replaceState(null, '', window.location.pathname);
+      try {
+        const r = await fetch(AUTH_BASE + '/magic-link/exchange', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: magic })
+        });
+        const d = await r.json();
+        if (r.ok && d.token) {
+          setSession(d.token);
+          openChat(d.email);
+          return;
+        }
+        showGateForms();
+        showGateError('Ce lien est invalide ou expiré. Demande un nouveau lien ci-dessous.');
+        return;
+      } catch (e) {
+        showGateForms();
+        showGateError('Connexion impossible pour le moment. Réessaie.');
+        return;
+      }
+    }
+    // 2. Une session stockée est-elle encore valide ? (vérification silencieuse)
+    const stored = getSession();
+    if (stored) {
+      try {
+        const r = await fetch(AUTH_BASE + '/me', {
+          headers: { 'Authorization': 'Bearer ' + stored }
+        });
+        if (r.ok) {
+          const d = await r.json();
+          openChat(d.email);
+          return;
+        }
+        clearSession(); // session expirée ou révoquée
+      } catch (e) { /* réseau indisponible : on affiche l'écran de connexion */ }
+    }
+    // 3. Pas de session : écran de connexion.
+    showGateForms();
+  }
+
+  // ─── GOOGLE SIGN-IN ───────────────────────────────────────────────────────
+  function initGoogleButton() {
+    if (!(window.google && google.accounts && google.accounts.id)) {
+      setTimeout(initGoogleButton, 300); // la librairie GIS charge en async
+      return;
+    }
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: onGoogleCredential
+    });
+    google.accounts.id.renderButton(document.getElementById('googleBtn'), {
+      theme: 'outline', size: 'large', text: 'signin_with',
+      locale: 'fr', width: 320
+    });
+  }
+
+  async function onGoogleCredential(response) {
+    try {
+      const r = await fetch(AUTH_BASE + '/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: response.credential })
+      });
+      const d = await r.json();
+      if (r.ok && d.token) {
+        setSession(d.token);
+        openChat(d.email);
+      } else {
+        showGateError(d.error || 'Connexion Google refusée.');
+      }
+    } catch (e) {
+      showGateError('Connexion impossible pour le moment. Réessaie.');
+    }
+  }
+
+  // ─── LIEN MAGIQUE ─────────────────────────────────────────────────────────
+  async function requestMagicLink() {
+    const email = document.getElementById('emailInput').value.trim().toLowerCase().replace(/\s+/g, '');
+    const err = document.getElementById('gateError');
+    err.style.display = 'none';
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      showGateError("Merci d'entrer un email valide.");
+      return;
+    }
+    const btn = document.getElementById('magicBtn');
+    btn.disabled = true;
+    try {
+      await fetch(AUTH_BASE + '/magic-link/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      });
+      showGateInfo('Si l\'adresse est valide, un lien de connexion vient de partir. Vérifie ta boîte (et tes spams) — le lien est valable 15 minutes.');
+    } catch (e) {
+      showGateError('Envoi impossible pour le moment. Réessaie.');
+    }
+    btn.disabled = false;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('emailInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') requestMagicLink();
+    });
+    initAuth();
+  });
+
+  // ─── CHAT (inchangé) ──────────────────────────────────────────────────────
   function resetChat() {
     sessionId = generateSessionId();
     const msgs = document.getElementById('messages');
@@ -485,10 +660,6 @@
       </div>`;
     document.getElementById('msgInput').focus();
   }
-
-  document.getElementById('emailInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') startChat();
-  });
 
   function sendSuggestion(text) {
     const w = document.getElementById('welcomeMsg');
