@@ -358,12 +358,8 @@
 
   /* ================= Jeton & appels API ================= */
   function lireJeton() {
-    try {
-      const brut = localStorage.getItem(SESSION_KEY);
-      if (!brut) return null;
-      const obj = JSON.parse(brut);
-      return obj.token || null;
-    } catch (e) { return null; }
+    // Aligné sur index.html : le jeton est stocké en chaîne brute (pas en JSON).
+    return localStorage.getItem(SESSION_KEY) || null;
   }
 
   function versConnexion() {
