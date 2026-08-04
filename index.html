@@ -76,6 +76,19 @@
   }
   .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #7BA382; }
 
+  /* Entrée LA TEAM (visible une fois connectée) */
+  #teamLink {
+    display: none;
+    margin-left: 16px;
+    align-items: center; gap: 6px;
+    font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 400;
+    letter-spacing: 0.03em; text-transform: none;
+    color: var(--bordeaux); text-decoration: none;
+    transition: color 0.2s;
+  }
+  #teamLink:hover { color: var(--bordeaux-light); }
+  #teamLink.visible { display: flex; }
+
   #resetBtn {
     display: none;
     margin-left: 16px;
@@ -385,6 +398,7 @@
   </div>
   <div class="header-right">
     <div class="status-dot"></div>
+    <a id="teamLink" href="team.html">✨ LA TEAM</a>
     <button id="resetBtn" onclick="resetChat()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -517,6 +531,7 @@
     document.getElementById('chat').style.display = 'flex';
     document.getElementById('userEmailDisplay').textContent = email;
     document.getElementById('resetBtn').classList.add('visible');
+    document.getElementById('teamLink').classList.add('visible');
     document.getElementById('msgInput').focus();
   }
 
