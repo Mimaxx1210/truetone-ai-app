@@ -391,6 +391,7 @@
 <style>
   /* ─── ONBOARDING (écrans 2-6) ─────────────────────────────────────────── */
   #onboarding { display: none; position: fixed; inset: 0; background: #FBF8F4; z-index: 60; overflow-y: auto; }
+  #onboarding.ob-visible { display: block; }
   .ob-screen { display: none; flex-direction: column; min-height: 100dvh; max-width: 430px; margin: 0 auto; padding: 20px 24px 28px; box-sizing: border-box; font-family: 'Jost', sans-serif; }
   .ob-top { display: flex; align-items: center; justify-content: space-between; height: 30px; flex: none; }
   .ob-dots { display: flex; align-items: center; gap: 6px; }
@@ -431,6 +432,11 @@
   .ob-check svg { margin-top: 3px; flex: none; }
   .ob-check p { font-size: 15px; font-weight: 300; line-height: 1.5; color: #4A3A30; margin: 0; }
   .ob-note { font-size: 12px; font-weight: 300; letter-spacing: 0.06em; color: #9A897B; margin: 30px 0 0; }
+  @media (min-width: 600px) {
+    #onboarding { background: #EDE6DC; display: none; align-items: center; justify-content: center; padding: 32px 16px; }
+    #onboarding.ob-visible { display: flex; }
+    .ob-screen { min-height: 0; height: 820px; max-height: calc(100dvh - 64px); width: 400px; background: #FBF8F4; border-radius: 34px; box-shadow: 0 22px 50px -24px rgba(44,24,16,0.35); overflow-y: auto; }
+  }
 </style>
 </head>
 <body>
@@ -676,7 +682,8 @@
     if (onboardingDone) { openChat(email); return; }
     obEmail = email;
     document.getElementById('gate').style.display = 'none';
-    document.getElementById('onboarding').style.display = 'block';
+    document.getElementById('onboarding').style.display = '';
+    document.getElementById('onboarding').classList.add('ob-visible');
     montrerEcranOb(2);
   }
 
@@ -704,6 +711,7 @@
         body: JSON.stringify({ consent_email: obConsent })
       });
     } catch (e) { /* non bloquant : au pire l'onboarding se represente */ }
+    document.getElementById('onboarding').classList.remove('ob-visible');
     document.getElementById('onboarding').style.display = 'none';
     btn.disabled = false;
     openChat(obEmail);
