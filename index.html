@@ -387,6 +387,134 @@
     .msg { max-width: 90%; }
     .input-area { padding: 14px 16px 18px; }
   }
+
+  /* ===== Intégration écran Beauté : nav + Beauté + Profil ===== */
+  :root { --fuchsia: #C21E63; }
+
+  #beaute, #profil { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  #profil { overflow-y: auto; }
+
+  .bt-scroll { flex: 1; overflow-y: auto; padding: 18px 16px 8px; }
+  .bt-sect { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600;
+    color: var(--chocolat); letter-spacing: 0.06em; text-transform: uppercase; margin: 2px 0 11px; }
+
+  .bt-carn { border-radius: 20px; overflow: hidden; position: relative; height: 250px;
+    background: linear-gradient(120deg,#3B2417,#5A3520,#8B5A2B,#B07A45,#D2A679);
+    box-shadow: var(--shadow-lg); margin-bottom: 26px; }
+  .bt-carn img { width: 100%; height: 100%; object-fit: cover; object-position: 58% 26%; display: block; }
+  .bt-veil { position: absolute; inset: auto 0 0 0; height: 75%;
+    background: linear-gradient(180deg, rgba(44,24,16,0), rgba(44,24,16,0.88)); }
+  .bt-overlay { position: absolute; left: 16px; right: 16px; bottom: 15px; }
+  .bt-cname { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #fff; }
+  .bt-csub { font-size: 13px; color: #F0E9DD; margin: 3px 0 11px; }
+  .bt-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .bt-chip { font-size: 12px; padding: 6px 13px; border-radius: 100px;
+    background: rgba(255,255,255,0.94); color: var(--fuchsia); }
+
+  .bt-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 18px;
+    padding: 16px 16px 14px; box-shadow: var(--shadow); margin-bottom: 26px; }
+  .bt-teaser { font-size: 12.5px; color: var(--chocolat-muted); margin-bottom: 6px; }
+  .bt-prow { display: flex; justify-content: space-between; align-items: center; padding: 9px 0;
+    border-bottom: 1px solid var(--border-light); font-size: 13px; }
+  .bt-prow:last-of-type { border-bottom: none; }
+  .bt-k { color: var(--chocolat-muted); }
+  .bt-prow.lock .bt-v { color: #B7A79A; }
+  .bt-unlock { margin-top: 12px; width: 100%; padding: 11px; border-radius: 12px; background: none;
+    border: 1.4px solid var(--bordeaux); color: var(--bordeaux); font-family: 'Jost', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer; }
+
+  .bt-factice { background: #FFF7E6; border: 1px solid #F0DDB0; border-radius: 10px;
+    padding: 8px 11px; font-size: 11px; color: #7A5A22; margin-bottom: 12px; }
+  .bt-themes { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+  .bt-theme { flex: none; font-size: 11.5px; padding: 6px 13px; border-radius: 100px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--chocolat-muted);
+    cursor: pointer; white-space: nowrap; }
+  .bt-theme.on { background: var(--fuchsia); border-color: var(--fuchsia); color: #fff; }
+  .bt-kit { border-radius: 16px; overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .bt-head { position: relative; height: 118px; cursor: pointer; }
+  .bt-ph { width: 100%; height: 100%; }
+  .bt-kit.soiree .bt-ph { background: linear-gradient(140deg,#5A3520,#8B3A3A); }
+  .bt-kit.bureau .bt-ph { background: linear-gradient(140deg,#C97B5A,#8B3A3A); }
+  .bt-kit.mariage .bt-ph { background: linear-gradient(140deg,#8B5A2B,#5A3520); }
+  .bt-kit.essentiels .bt-ph { background: repeating-linear-gradient(45deg,#EDE3D6,#EDE3D6 8px,#E4D7C6 8px,#E4D7C6 16px); }
+  .bt-veil2 { position: absolute; inset: auto 0 0 0; height: 72%;
+    background: linear-gradient(180deg, rgba(44,24,16,0), rgba(44,24,16,0.8)); }
+  .bt-kit.essentiels .bt-veil2 { display: none; }
+  .bt-cat { position: absolute; top: 11px; left: 11px; background: var(--bg); color: var(--fuchsia);
+    font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: 100px; }
+  .bt-tx { position: absolute; left: 14px; bottom: 12px; }
+  .bt-kit.essentiels .bt-tx { position: static; padding: 16px 14px 4px; }
+  .bt-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: #fff; }
+  .bt-kit.essentiels .bt-title { color: var(--chocolat); }
+  .bt-meta { font-size: 11.5px; color: #F0E9DD; margin-top: 2px; }
+  .bt-kit.essentiels .bt-meta { color: var(--chocolat-muted); }
+  .bt-detail { background: var(--surface); padding: 10px; display: none; }
+  .bt-kit.open .bt-detail { display: block; }
+  .bt-prod { display: flex; gap: 11px; align-items: center; padding: 9px 4px; border-bottom: 1px solid var(--border-light); }
+  .bt-prod:last-child { border-bottom: none; }
+  .bt-thumb { width: 52px; height: 52px; border-radius: 11px; flex-shrink: 0; background: linear-gradient(140deg,#D2A679,#B07A45); }
+  .bt-thumb.empty { background: repeating-linear-gradient(45deg,#F0E9DD,#F0E9DD 6px,#E7DCCB 6px,#E7DCCB 12px); }
+  .bt-pinfo { flex: 1; min-width: 0; }
+  .bt-pn { font-size: 13px; }
+  .bt-ps { font-size: 11.5px; color: var(--chocolat-muted); margin-top: 2px; }
+  .bt-price { font-size: 11px; color: var(--chocolat-mid); background: var(--surface2); padding: 3px 9px; border-radius: 100px; margin-top: 5px; display: inline-block; }
+  .bt-cta { flex-shrink: 0; background: var(--bordeaux); color: #fff; border: none; font-size: 12px; font-weight: 500; padding: 8px 13px; border-radius: 11px; cursor: pointer; }
+  .bt-nolink { flex-shrink: 0; font-size: 10.5px; color: #B7A79A; font-style: italic; }
+
+  .bt-ask { display: flex; gap: 8px; align-items: center; background: var(--surface);
+    border-top: 1px solid var(--border-light); padding: 12px 16px; flex-shrink: 0; }
+  .bt-ask input { flex: 1; border: 1px solid var(--border); border-radius: 100px; outline: none;
+    font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--chocolat); padding: 9px 15px; background: var(--bg); }
+  .bt-ask input::placeholder { color: var(--chocolat-muted); }
+  .bt-ask button { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: none;
+    background: rgba(90,53,32,0.10); color: #5A3520; font-size: 14px; cursor: pointer; }
+
+  .pf-wrap { padding: 24px 18px; max-width: 520px; width: 100%; margin: 0 auto; }
+  .pf-h { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--chocolat); margin-bottom: 4px; }
+  .pf-sub { font-size: 13px; color: var(--chocolat-muted); margin-bottom: 20px; }
+  .pf-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .pf-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13.5px; border-bottom: 1px solid var(--border-light); }
+  .pf-row:last-child { border-bottom: none; }
+  .pf-k { color: var(--chocolat-muted); }
+  .pf-badge { display: inline-block; background: var(--bordeaux-pale); color: var(--bordeaux); font-size: 12px; padding: 4px 12px; border-radius: 100px; }
+  .pf-legal { display: flex; flex-direction: column; }
+  .pf-legal a { color: var(--chocolat-mid); text-decoration: none; font-size: 13.5px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+  .pf-legal a:last-child { border-bottom: none; }
+  .pf-logout { width: 100%; margin-top: 4px; padding: 12px; border-radius: 12px; background: none;
+    border: 1.4px solid var(--bordeaux); color: var(--bordeaux); font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .pf-foot { text-align: center; font-size: 11.5px; color: var(--chocolat-muted); margin-top: 22px; }
+
+  #rtNav { display: none; align-items: center; background: var(--surface);
+    border-top: 1px solid var(--border-light); padding: 6px 8px; flex-shrink: 0; gap: 2px; }
+  .rt-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px; border-radius: 15px; cursor: pointer; }
+  .rt-tab svg { width: 21px; height: 21px; stroke: #9A8879; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .rt-lb { font-size: 10px; color: var(--chocolat-muted); letter-spacing: 0.02em; }
+  .rt-tab.active { background: linear-gradient(120deg, rgba(90,53,32,0.10), rgba(194,30,99,0.14)); }
+  .rt-tab.active svg { stroke: var(--fuchsia); }
+  .rt-tab.active .rt-lb { color: var(--fuchsia); font-weight: 500; }
+
+  .bt-pinrow { display: none; gap: 8px; margin-top: 10px; }
+  .bt-pinrow input { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px;
+    font-family: 'Jost', sans-serif; font-size: 13px; color: var(--chocolat); outline: none; }
+  .bt-pinok { background: var(--bordeaux); color: #fff; border: none; border-radius: 10px; padding: 0 16px;
+    font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .bt-unlocked { display: none; }
+  .bt-empty { display: none; text-align: center; color: var(--chocolat-muted); font-size: 12.5px; padding: 14px; }
+  .bt-link { display: inline-block; margin-top: 8px; font-size: 12px; color: var(--bordeaux); cursor: pointer; text-decoration: underline; }
+  .pf-plan { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .pf-plan-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--chocolat); }
+  .pf-plan-desc { font-size: 12.5px; color: var(--chocolat-muted); margin-top: 2px; }
+  .pf-plan-price { font-size: 20px; font-weight: 500; color: var(--bordeaux); white-space: nowrap; }
+  .pf-plan-price span { font-size: 12px; color: var(--chocolat-muted); font-weight: 400; }
+  .pf-upgrade { width: 100%; padding: 12px; border-radius: 12px; background: var(--bordeaux); color: #fff;
+    border: none; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+  #chat .user-info { display: none; } /* infos compte déplacées dans Profil */
+  .pf-downgrade { width: 100%; padding: 12px; border-radius: 12px; background: none;
+    border: 1.4px solid var(--bordeaux); color: var(--bordeaux); font-family: 'Jost', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer; }
+  a.bt-cta { text-decoration: none; display: inline-block; }
+  header #teamLink { display: none !important; } /* LA TEAM déplacé dans la barre d'onglets */
+
 </style>
 <style>
   /* ─── ONBOARDING (écrans 2-6) ─────────────────────────────────────────── */
@@ -444,7 +572,7 @@
 <header>
   <div class="logo">
     <div class="logo-mark">💄</div>
-    <div class="logo-text">TrueTone <span>AI</span></div>
+    <div class="logo-text">Rosy</div>
   </div>
   <div class="header-right">
     <div class="status-dot"></div>
@@ -622,8 +750,120 @@
   </div>
 </div>
 
+
+<!-- ===== ÉCRAN BEAUTÉ ===== -->
+<div id="beaute">
+  <div class="bt-scroll">
+    <div class="bt-sect">Ta carnation</div>
+    <div class="bt-carn">
+      <img src="ecran5_portrait.webp" alt="" onerror="this.style.display='none'">
+      <div class="bt-veil"></div>
+      <div class="bt-overlay">
+        <div class="bt-cname" id="btCarn">Ta carnation</div>
+        <div class="bt-csub" id="btCarnSub">Scanne ta peau avec Rosy pour la révéler</div>
+        <div class="bt-chips" id="btCarnChips"></div>
+      </div>
+    </div>
+
+    <div class="bt-sect">Mon passeport beauté</div>
+    <div class="bt-card">
+      <div class="bt-teaser">Ton dossier complet, géré avec Rosy.</div>
+      <div id="btLocked">
+        <div class="bt-prow lock"><span class="bt-k">Mes routines</span><span class="bt-v">🔒 Verrouillé</span></div>
+        <div class="bt-prow lock"><span class="bt-k">Mes produits validés</span><span class="bt-v">🔒 Verrouillé</span></div>
+        <button class="bt-unlock" onclick="askPin()">Déverrouiller avec mon code</button>
+        <div id="btPinRow" class="bt-pinrow">
+          <input id="btPin" inputmode="numeric" maxlength="8" placeholder="Ton code">
+          <button class="bt-pinok" onclick="submitPin()">Valider</button>
+        </div>
+        <a class="bt-link" onclick="resetPin()">Code oublié ?</a>
+        <div id="btResetRow" class="bt-pinrow">
+          <input id="btNewPin" inputmode="numeric" maxlength="8" placeholder="Nouveau code">
+          <button class="bt-pinok" onclick="saveNewPin()">Enregistrer</button>
+        </div>
+      </div>
+      <div id="btUnlocked" class="bt-unlocked">
+        <div class="bt-teaser">✓ Code validé — tes routines et produits validés s'afficheront ici (branchement routine-manager en cours).</div>
+      </div>
+    </div>
+
+    <div class="bt-sect">Mes trousses</div>
+    <div class="bt-themes">
+      <span class="bt-theme on" onclick="filterTheme('toutes',this)">Toutes</span>
+      <span class="bt-theme" onclick="filterTheme('jour',this)">Jour</span>
+      <span class="bt-theme" onclick="filterTheme('soiree',this)">Soirée</span>
+      <span class="bt-theme" onclick="filterTheme('bureau',this)">Bureau</span>
+      <span class="bt-theme" onclick="filterTheme('mariage',this)">Mariage</span>
+      <span class="bt-theme" onclick="filterTheme('vacances',this)">Vacances</span>
+    </div>
+
+<div id="btKits"></div>
+
+    <div id="btEmpty" class="bt-empty">Aucune trousse pour ce thème pour l'instant.</div>
+  </div>
+
+  <div class="bt-ask">
+    <input id="btAsk" placeholder="Demande à Rosy : ajouter un produit, compléter ton passeport…" onkeydown="if(event.key==='Enter'){askRosy();}">
+    <button onclick="askRosy()" title="Ouvre Rosy avec ta demande">↑</button>
+  </div>
+</div>
+
+<!-- ===== ÉCRAN PROFIL ===== -->
+<div id="profil">
+  <div class="pf-wrap">
+    <div class="pf-h">Mon profil</div>
+    <div class="pf-sub">Ton compte et tes préférences</div>
+    <div class="pf-card">
+      <div class="pf-row"><span class="pf-k">Prénom / pseudo</span><span id="pfName">—</span></div>
+      <div class="pf-row"><span class="pf-k">Email</span><span id="pfEmail">—</span></div>
+      <div class="pf-row"><span class="pf-k">Connexion</span><span>Lien email &middot; Google</span></div>
+      <div class="pf-row"><span class="pf-k">Formule</span><span class="pf-badge" id="pfTierBadge">Découverte &middot; Gratuit</span></div>
+    </div>
+
+    <div class="pf-card">
+      <div id="pfPlanFree">
+        <div class="pf-plan">
+          <div><div class="pf-plan-name">Signature</div><div class="pf-plan-desc">Passe à l'offre complète</div></div>
+          <div class="pf-plan-price">9,99&nbsp;€<span>/mois</span></div>
+        </div>
+        <button class="pf-upgrade" onclick="upgradeSignature()">Passer à Signature</button>
+      </div>
+      <div id="pfPlanPaid" style="display:none">
+        <div class="pf-plan">
+          <div><div class="pf-plan-name">Signature</div><div class="pf-plan-desc">Formule active &middot; 9,99 €/mois</div></div>
+          <span class="pf-badge">Active</span>
+        </div>
+        <button class="pf-downgrade" onclick="goDowngrade()">Revenir à Découverte</button>
+      </div>
+    </div>
+    <div class="pf-card pf-legal">
+      <a href="https://rosy-legal.netlify.app/confidentialite" target="_blank" rel="noopener">Confidentialité</a>
+      <a href="https://rosy-legal.netlify.app/suppression-compte" target="_blank" rel="noopener">Supprimer mon compte</a>
+    </div>
+    <button class="pf-logout" onclick="logout()">Se déconnecter</button>
+    <div class="pf-foot">éditée par TrueTone AI</div>
+  </div>
+</div>
+
+<!-- ===== BARRE D'ONGLETS ===== -->
+<div id="rtNav">
+  <div class="rt-tab active" data-tab="rosy" onclick="showTab('rosy')">
+    <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg><div class="rt-lb">Rosy</div></div>
+  <div class="rt-tab" data-tab="team" onclick="showTab('team')">
+    <svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/></svg><div class="rt-lb">LA TEAM</div></div>
+  <div class="rt-tab" data-tab="beaute" onclick="showTab('beaute')">
+    <svg viewBox="0 0 24 24"><path d="M9 3h6v5a3 3 0 0 1-6 0z"/><path d="M9 13h6v8H9z"/></svg><div class="rt-lb">Beauté</div></div>
+  <div class="rt-tab" data-tab="profil" onclick="showTab('profil')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><div class="rt-lb">Profil</div></div>
+</div>
+
 <script>
   const API_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/chat';
+  const MANAGE_CART_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/beaute/kit';
+  const PROFIL_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/beaute/profil';
+  const CARNATION_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/beaute/carnation';
+  const ROUTINES_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/beaute/routines';
+  const PIN_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/beaute/pin';
   const ANALYZE_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/analyze-skin';
   const AUTH_BASE = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/auth';
   const GOOGLE_CLIENT_ID = '214461444330-ff08g71g6d5q5jj33gh6885ljtrrsnuf.apps.googleusercontent.com';
@@ -1075,6 +1315,7 @@
 
       // Mise à jour du message "en cours" avec le résultat réel
       pendingMsg.querySelector('.msg-bubble').innerHTML = formatMessage(analysisMsg);
+      persistCarnation(data.carnation, data.undertone);
 
       // Envoi à Rosy
       const sendRes = await fetch(API_URL, {
@@ -1119,5 +1360,191 @@
     }
   }
 </script>
+
+<script>
+/* ===== Intégration nav + Beauté + Profil (n'altère pas l'auth/chat existants) ===== */
+(function () {
+  function setTab(name) {
+    var map = { rosy: 'chat', beaute: 'beaute', profil: 'profil' };
+    ['chat', 'beaute', 'profil'].forEach(function (v) {
+      var el = document.getElementById(v); if (el) el.style.display = 'none';
+    });
+    var el = document.getElementById(map[name]); if (el) el.style.display = 'flex';
+    document.querySelectorAll('.rt-tab').forEach(function (t) {
+      t.classList.toggle('active', t.getAttribute('data-tab') === name);
+    });
+    var rb = document.getElementById('resetBtn');
+    if (rb) rb.style.display = (name === 'rosy') ? '' : 'none';
+    if (name === 'beaute') { loadProfil(); if (!window.__beauteLoaded) { window.__beauteLoaded = true; loadBeaute(); } }
+    if (name === 'profil') { populateProfil(); loadProfil(); }
+    if (name === 'rosy') { var mi = document.getElementById('msgInput'); if (mi) mi.focus(); }
+  }
+
+  window.showTab = function (name) {
+    if (name === 'team') { window.location.href = 'team.html'; return; }
+    setTab(name);
+  };
+
+  window.askRosy = function () {
+    var inp = document.getElementById('btAsk');
+    var val = inp ? inp.value.trim() : '';
+    setTab('rosy');
+    var mi = document.getElementById('msgInput');
+    if (mi) { if (val) { mi.value = val; if (window.autoResize) autoResize(mi); } mi.focus(); }
+    if (inp) inp.value = '';
+  };
+
+  // Lazy : à brancher au « Go pour finalisation »
+  function esc(s){ s=(s==null?'':String(s)); return s.replace(/[&<>"\']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function themeClass(t){ t=(t||'').toLowerCase();
+    if(t.indexOf('soir')>=0)return 'soiree'; if(t.indexOf('bureau')>=0)return 'bureau';
+    if(t.indexOf('mariage')>=0)return 'mariage'; if(t.indexOf('jour')>=0)return 'jour';
+    if(t.indexOf('vacance')>=0)return 'vacances'; return 'essentiels'; }
+  var CARN_LABEL = { ebene:'Ébène', cacao:'Cacao', caramel:'Caramel', miel:'Miel', beige_dore:'Beige Doré' };
+  var UT_LABEL = { warm:'chaud', cool:'froid', neutral:'neutre' };
+  function currentEmail(){ return (typeof userEmail!=='undefined' && userEmail) ? userEmail : (window.__email||''); }
+  window.loadProfil = async function(){
+    try{
+      var r = await fetch(PROFIL_URL+'?email='+encodeURIComponent(currentEmail()), { headers:{ 'Authorization':'Bearer '+getSession() } });
+      var d = await r.json();
+      if(d && d.carnation){ setCarnation({ carnation: CARN_LABEL[d.carnation]||d.carnation, undertone: UT_LABEL[d.undertone]||d.undertone, tags:[] }); }
+      else { setCarnation(null); }
+      if(d){ setTier(d.plan==='signature' ? 'signature' : 'decouverte'); }
+    }catch(e){ setCarnation(null); }
+  };
+  window.persistCarnation = async function(carnation, undertone){
+    try{ await fetch(CARNATION_URL, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+getSession() }, body: JSON.stringify({ email: currentEmail(), carnation: carnation, undertone: undertone }) }); }catch(e){}
+  };
+  window.renderRoutines = function(list){
+    var u=document.getElementById('btUnlocked'); if(!u) return;
+    if(!list || !list.length){ u.innerHTML="<div class='bt-teaser'>Aucune routine enregistrée. Demande à Rosy d'en créer une.</div>"; return; }
+    u.innerHTML = list.map(function(rt){ var n=(rt.produits||[]).length; return "<div class='bt-prow'><span class='bt-k'>"+esc(rt.nom)+"</span><span class='bt-v'>"+n+" produit"+(n>1?"s":"")+"</span></div>"; }).join('');
+  };
+  window.setCarnation = function(d){
+    var n=document.getElementById('btCarn'), s=document.getElementById('btCarnSub'), c=document.getElementById('btCarnChips');
+    if(!d){ if(n)n.textContent='Ta carnation'; if(s)s.textContent='Scanne ta peau avec Rosy pour la révéler'; if(c)c.innerHTML=''; return; }
+    if(n) n.textContent = d.carnation ? ('Carnation '+d.carnation) : 'Ta carnation';
+    if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · validé au scan') : '';
+    if(c) c.innerHTML = (d.tags||[]).map(function(t){return "<span class='bt-chip'>"+esc(t)+"</span>";}).join('');
+  };
+  window.renderTrousses = function(list){
+    var host=document.getElementById('btKits'); if(!host) return;
+    if(!list || !list.length){ host.innerHTML="<div class='bt-empty' style='display:block'>Tes trousses apparaîtront ici. Demande à Rosy d'en créer une.</div>"; return; }
+    var out='';
+    for(var i=0;i<list.length;i++){
+      var t=list[i], cls=themeClass(t.theme), arr=t.produits||[], prods='';
+      for(var j=0;j<arr.length;j++){
+        var p=arr[j];
+        var thumb = p.image_url ? "<div class='bt-thumb' style='background-image:url("+p.image_url+");background-size:cover'></div>" : "<div class='bt-thumb empty'></div>";
+        var shade = p.shade ? "<div class='bt-ps'>Teinte &middot; "+esc(p.shade)+"</div>" : "";
+        var price = p.price_eur ? "<span class='bt-price'>"+esc(p.price_eur)+"</span>" : "";
+        var cta = p.product_url ? "<a class='bt-cta' href='"+esc(p.product_url)+"' target='_blank' rel='noopener'>Voir ↗</a>" : "<span class='bt-nolink'>Hors partenaires</span>";
+        prods += "<div class='bt-prod'>"+thumb+"<div class='bt-pinfo'><div class='bt-pn'>"+esc(p.name)+"</div>"+shade+price+"</div>"+cta+"</div>";
+      }
+      if(!prods) prods="<div class='bt-prod'><div class='bt-pinfo'><div class='bt-pn'>Trousse vide</div></div></div>";
+      var cat = t.theme ? "<span class='bt-cat'>"+esc(t.theme)+"</span>" : "";
+      var veil = (cls==='essentiels') ? "" : "<div class='bt-veil2'></div>";
+      out += "<div class='bt-kit "+cls+(i===0?" open":"")+"' data-theme='"+cls+"'>"
+          + "<div class='bt-head'><div class='bt-ph'></div>"+veil+cat
+          + "<div class='bt-tx'><div class='bt-title'>"+esc(t.nom)+"</div><div class='bt-meta'>"+esc(t.meta)+"</div></div></div>"
+          + "<div class='bt-detail'>"+prods+"</div></div>";
+    }
+    host.innerHTML=out;
+  };
+  window.loadBeaute = async function(){
+    var host=document.getElementById('btKits'); if(!host) return;
+    host.innerHTML="<div class='bt-empty' style='display:block'>Chargement…</div>";
+    try{
+      var email=(typeof userEmail!=='undefined'&&userEmail)?userEmail:(window.__email||'');
+      var r=await fetch(MANAGE_CART_URL+'?email='+encodeURIComponent(email),{headers:{'Authorization':'Bearer '+getSession()}});
+      var data=await r.json();
+      renderTrousses((data&&data.trousses)||[]);
+    }catch(e){ host.innerHTML="<div class='bt-empty' style='display:block'>Tes trousses apparaîtront ici.</div>"; }
+  };
+  // ouverture/fermeture d'une trousse (délégation, cartes rendues dynamiquement)
+  document.addEventListener('click', function(e){
+    var head = e.target.closest ? e.target.closest('.bt-head') : null;
+    if(head && head.parentNode) head.parentNode.classList.toggle('open');
+  });
+
+  window.filterTheme = function (theme, pill) {
+    document.querySelectorAll('.bt-theme').forEach(function (x) { x.classList.toggle('on', x === pill); });
+    var any = false;
+    document.querySelectorAll('.bt-kit').forEach(function (k) {
+      var show = (theme === 'toutes') || (k.getAttribute('data-theme') === theme);
+      k.style.display = show ? '' : 'none';
+      if (show) any = true;
+    });
+    var e = document.getElementById('btEmpty'); if (e) e.style.display = any ? 'none' : 'block';
+  };
+  window.askPin = function () {
+    var r = document.getElementById('btPinRow'); if (r) r.style.display = 'flex';
+    var i = document.getElementById('btPin'); if (i) i.focus();
+  };
+  window.submitPin = async function () {
+    var pin = ((document.getElementById('btPin')||{}).value||'').trim();
+    try{
+      var r = await fetch(ROUTINES_URL+'?email='+encodeURIComponent(currentEmail()), { headers:{ 'Authorization':'Bearer '+getSession(), 'x-beaute-pin': pin } });
+      if(r.status===401){ alert('Code incorrect. Réessaie.'); return; }
+      if(r.status===404){ alert('Tu n\'as pas encore de code. Utilise « Code oublié ? » pour en définir un.'); return; }
+      var data = await r.json();
+      renderRoutines((data&&data.routines)||[]);
+      var l=document.getElementById('btLocked'), u=document.getElementById('btUnlocked');
+      if(l) l.style.display='none'; if(u) u.style.display='block';
+    }catch(e){ alert('Impossible de vérifier le code pour le moment.'); }
+  };
+  window.demoVoir = function () {
+    alert('Fiche produit (lien Awin) — active au « Go » avec les vraies données produit.');
+  };
+  window.resetPin = function () {
+    var r = document.getElementById('btResetRow'); if (r) r.style.display = 'flex';
+    var i = document.getElementById('btNewPin'); if (i) i.focus();
+  };
+  window.saveNewPin = async function () {
+    var pin = ((document.getElementById('btNewPin')||{}).value||'').trim();
+    if(!/^\d{4}$/.test(pin)){ alert('Le code doit contenir exactement 4 chiffres.'); return; }
+    try{
+      var r = await fetch(PIN_URL, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+getSession() }, body: JSON.stringify({ email: currentEmail(), pin: pin }) });
+      if(r.ok){ alert('Ton code est enregistré. Tu peux déverrouiller ton passeport.'); var rr=document.getElementById('btResetRow'); if(rr) rr.style.display='none'; }
+      else { alert('Impossible d\'enregistrer le code pour le moment.'); }
+    }catch(e){ alert('Impossible d\'enregistrer le code pour le moment.'); }
+  };
+  window.setTier = function (t) {
+    var sig = (t === 'signature');
+    var f = document.getElementById('pfPlanFree'), pd = document.getElementById('pfPlanPaid'), b = document.getElementById('pfTierBadge');
+    if (f) f.style.display = sig ? 'none' : 'block';
+    if (pd) pd.style.display = sig ? 'block' : 'none';
+    if (b) b.innerHTML = sig ? 'Signature' : 'Découverte &middot; Gratuit';
+    window.__tier = t;
+  };
+  window.upgradeSignature = function () { goSignature(); setTier('signature'); };
+  window.goDowngrade = function () {
+    alert("Retour à Découverte : l'abonnement Signature est résilié ; l'accès reste actif jusqu'à la fin de la période, puis bascule sur Découverte. (Branché à l'étape paiement.)");
+    setTier('decouverte');
+  };
+  window.goSignature = function () {
+    // Action laissée « derrière » : paiement Stripe via le programme de facturation EEA (Google Play). À brancher.
+    alert('Abonnement Signature — le paiement (Stripe, via le programme de facturation EEE de Google Play) se branche à l\'étape suivante.');
+  };
+
+  window.populateProfil = function () {
+    var e = (typeof userEmail !== 'undefined' && userEmail) ? userEmail : (window.__email || '');
+    var el = document.getElementById('pfEmail'); if (el) el.textContent = e || '—';
+  };
+
+
+  // Révèle la barre d'onglets à l'ouverture de l'app, sans réécrire openChat
+  if (typeof window.openChat === 'function') {
+    var _openChat = window.openChat;
+    window.openChat = function (email) {
+      window.__email = email;
+      _openChat(email);
+      var n = document.getElementById('rtNav'); if (n) n.style.display = 'flex';
+      setTab('rosy');
+    };
+  }
+})();
+</script>
+
 </body>
 </html>
