@@ -855,7 +855,8 @@
 </script>
 <script>
   /* ===== Onboarding LA TEAM (parcours 3 volets) ===== */
-  var TR_OB_KEY = 'rosy_team_rules_v1';
+  function trEmail(){ try{ return localStorage.getItem('rosy_email') || 'anon'; }catch(e){ return 'anon'; } }
+  function trKey(){ return 'rosy_team_rules_v1_' + trEmail(); }
   function trObGo(n){
     for(var i=1;i<=3;i++){
       var s=document.getElementById('trOb'+i);
@@ -868,10 +869,10 @@
   function trObFin(){
     var ob=document.getElementById('teamOb'); if(ob) ob.classList.remove('on');
     for(var i=1;i<=3;i++){ var s=document.getElementById('trOb'+i); if(s) s.classList.remove('on'); }
-    try{ localStorage.setItem(TR_OB_KEY,'1'); }catch(e){}
+    try{ localStorage.setItem(trKey(),'1'); }catch(e){}
   }
   document.addEventListener('DOMContentLoaded', function(){
-    var seen=false; try{ seen = localStorage.getItem(TR_OB_KEY)==='1'; }catch(e){}
+    var seen=false; try{ seen = localStorage.getItem(trKey())==='1'; }catch(e){}
     if(!seen){ trObGo(1); }
   });
 </script>
