@@ -518,6 +518,41 @@
   a.bt-cta { text-decoration: none; display: inline-block; }
   header #teamLink { display: none !important; } /* LA TEAM déplacé dans la barre d'onglets */
 
+
+  /* ===== Guide d'accueil écran Beauté (écran unique, 1re visite) ===== */
+  #beauteGuide { position: fixed; inset: 0; background: var(--bg); z-index: 90; display: none; }
+  #beauteGuide.on { display: block; }
+  .bgd-card { display: flex; flex-direction: column; min-height: 100dvh; max-width: 460px;
+    margin: 0 auto; padding: 16px 22px 26px; box-sizing: border-box; overflow-y: auto; }
+  .bgd-top { display: flex; align-items: center; justify-content: space-between; height: 30px; flex: none; }
+  .bgd-skip { background: none; border: none; font-size: 13px; color: var(--chocolat-muted);
+    cursor: pointer; font-family: 'Jost', sans-serif; letter-spacing: 0.04em; }
+  .bgd-hero { border-radius: 22px; height: 150px; margin-top: 14px; flex: none; position: relative;
+    overflow: hidden; box-shadow: var(--shadow);
+    background: linear-gradient(120deg,#3B2417,#5A3520,#8B5A2B,#B07A45,#D2A679); }
+  .bgd-glow { position: absolute; inset: auto 0 0 0; height: 60%;
+    background: linear-gradient(180deg, rgba(44,24,16,0), rgba(44,24,16,0.5)); }
+  .bgd-tag { position: absolute; left: 16px; bottom: 14px; color: #fff;
+    font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; letter-spacing: 0.02em; }
+  .bgd-h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 29px;
+    line-height: 1.14; color: var(--chocolat); margin: 18px 0 0; }
+  .bgd-body { font-size: 14.5px; font-weight: 300; line-height: 1.6; color: var(--chocolat-mid); margin: 12px 0 2px; }
+  .bgd-feat { display: flex; gap: 13px; align-items: flex-start; background: var(--surface);
+    border: 1px solid var(--border-light); border-radius: 16px; padding: 14px 15px; margin-top: 12px; box-shadow: var(--shadow); }
+  .bgd-feat .bgd-ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex;
+    align-items: center; justify-content: center; font-size: 19px; background: var(--bordeaux-pale); }
+  .bgd-feat h3 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--chocolat); margin: 0 0 3px; }
+  .bgd-feat p { font-size: 12.5px; font-weight: 300; line-height: 1.5; color: var(--chocolat-mid); margin: 0; }
+  .bgd-spacer { flex: 1; min-height: 14px; }
+  .bgd-cta { width: 100%; border: none; background: var(--bordeaux); color: var(--bg);
+    font-family: 'Jost', sans-serif; font-size: 15px; letter-spacing: 0.03em; padding: 16px 0; border-radius: 15px; cursor: pointer; margin-top: 14px; }
+  .bgd-cta:active { background: #7A3131; }
+  .bt-guide-link { display: block; text-align: right; font-size: 12px; color: var(--bordeaux); cursor: pointer; margin-bottom: 4px; }
+  @media (min-width: 600px) {
+    #beauteGuide.on { display: flex; align-items: center; justify-content: center; padding: 28px 16px; background: #EDE6DC; }
+    .bgd-card { min-height: 0; max-height: calc(100dvh - 56px); width: 420px; background: var(--bg);
+      border-radius: 32px; box-shadow: 0 22px 50px -24px rgba(44,24,16,0.35); }
+  }
 </style>
 <style>
   /* ─── ONBOARDING (écrans 2-6) ─────────────────────────────────────────── */
@@ -757,6 +792,7 @@
 <!-- ===== ÉCRAN BEAUTÉ ===== -->
 <div id="beaute">
   <div class="bt-scroll">
+    <span class="bt-guide-link" onclick="ouvrirGuideBeaute()">Comment ça marche ?</span>
     <div class="bt-sect">Ta carnation</div>
     <div class="bt-carn">
       <img src="ecran5_portrait.webp" alt="" onerror="this.style.display='none'">
@@ -849,6 +885,25 @@
 </div>
 
 <!-- ===== BARRE D'ONGLETS ===== -->
+<!-- ===== GUIDE D'ACCUEIL BEAUTÉ ===== -->
+<div id="beauteGuide">
+  <div class="bgd-card">
+    <div class="bgd-top">
+      <div></div>
+      <button class="bgd-skip" onclick="fermerGuideBeaute()">Fermer</button>
+    </div>
+    <div class="bgd-hero"><div class="bgd-glow"></div><div class="bgd-tag">Ton espace beauté</div></div>
+    <h1 class="bgd-h1">Bienvenue dans ton espace beauté</h1>
+    <p class="bgd-body">Rosy réunit ici tout ce qui concerne ta peau. Voici ce que tu y trouves :</p>
+    <div class="bgd-feat"><div class="bgd-ic">📷</div><div><h3>Ta carnation</h3><p>Révélée au scan, sous-ton compris — affichée en haut de l’écran.</p></div></div>
+    <div class="bgd-feat"><div class="bgd-ic">🔒</div><div><h3>Ton passeport</h3><p>Routines et produits validés, protégés par ton code personnel.</p></div></div>
+    <div class="bgd-feat"><div class="bgd-ic">💼</div><div><h3>Tes trousses</h3><p>Des kits prêts par occasion : jour, soirée, bureau, mariage…</p></div></div>
+    <div class="bgd-feat"><div class="bgd-ic">💬</div><div><h3>Demande à Rosy</h3><p>Ajoute un produit ou complète ton passeport depuis le champ en bas.</p></div></div>
+    <div class="bgd-spacer"></div>
+    <button class="bgd-cta" onclick="fermerGuideBeaute()">C’est parti</button>
+  </div>
+</div>
+
 <div id="rtNav">
   <div class="rt-tab active" data-tab="rosy" onclick="showTab('rosy')">
     <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg><div class="rt-lb">Rosy</div></div>
@@ -1549,5 +1604,30 @@
 })();
 </script>
 
+<script>
+  /* ===== Guide d'accueil de l'écran Beauté (écran unique, 1re visite) ===== */
+  (function(){
+    var GKEY = 'rosy_beaute_guide_v1';
+    function afficher(){
+      var g = document.getElementById('beauteGuide');
+      if(g){ g.classList.add('on'); var c = g.querySelector('.bgd-card'); if(c) c.scrollTop = 0; }
+    }
+    window.ouvrirGuideBeaute = function(){ afficher(); };
+    window.fermerGuideBeaute = function(){
+      var g = document.getElementById('beauteGuide'); if(g) g.classList.remove('on');
+      try{ localStorage.setItem(GKEY,'1'); }catch(e){}
+    };
+    if(typeof window.showTab === 'function'){
+      var _showTab = window.showTab;
+      window.showTab = function(name){
+        _showTab(name);
+        if(name === 'beaute'){
+          var seen=false; try{ seen = localStorage.getItem(GKEY)==='1'; }catch(e){}
+          if(!seen) afficher();
+        }
+      };
+    }
+  })();
+</script>
 </body>
 </html>
