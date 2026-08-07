@@ -1607,7 +1607,8 @@
 <script>
   /* ===== Guide d'accueil de l'écran Beauté (écran unique, 1re visite) ===== */
   (function(){
-    var GKEY = 'rosy_beaute_guide_v1';
+    function email(){ return (window.__email || (typeof userEmail!=='undefined' && userEmail) || ''); }
+    function gkey(){ return 'rosy_beaute_guide_v1_' + (email() || 'anon'); }
     function afficher(){
       var g = document.getElementById('beauteGuide');
       if(g){ g.classList.add('on'); var c = g.querySelector('.bgd-card'); if(c) c.scrollTop = 0; }
@@ -1615,14 +1616,18 @@
     window.ouvrirGuideBeaute = function(){ afficher(); };
     window.fermerGuideBeaute = function(){
       var g = document.getElementById('beauteGuide'); if(g) g.classList.remove('on');
-      try{ localStorage.setItem(GKEY,'1'); }catch(e){}
+      try{ localStorage.setItem(gkey(),'1'); }catch(e){}
     };
+    if(typeof window.openChat === 'function'){
+      var _openChat = window.openChat;
+      window.openChat = function(e){ try{ if(e) localStorage.setItem('rosy_email', e); }catch(x){} return _openChat(e); };
+    }
     if(typeof window.showTab === 'function'){
       var _showTab = window.showTab;
       window.showTab = function(name){
         _showTab(name);
         if(name === 'beaute'){
-          var seen=false; try{ seen = localStorage.getItem(GKEY)==='1'; }catch(e){}
+          var seen=false; try{ seen = localStorage.getItem(gkey())==='1'; }catch(e){}
           if(!seen) afficher();
         }
       };
