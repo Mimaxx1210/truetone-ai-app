@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>LA TEAM — Rosy</title>
+<title>LA TEAM — TrueTone AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -302,6 +302,64 @@
     max-width: 88%; text-align: center;
   }
   .toast.show { opacity: 1; }
+
+  /* ===== Onboarding LA TEAM — parcours 3 volets ===== */
+  .header-actions { display: flex; align-items: center; gap: 16px; }
+  .rules-link { background: none; border: none; font-family: 'Jost', sans-serif;
+    font-size: 13px; color: var(--bordeaux); cursor: pointer; letter-spacing: 0.02em; }
+  #teamOb { position: fixed; inset: 0; background: var(--bg); z-index: 80; display: none; }
+  #teamOb.on { display: block; }
+  .tr-ob-screen { display: none; flex-direction: column; min-height: 100dvh;
+    max-width: 460px; margin: 0 auto; padding: 16px 22px 26px; box-sizing: border-box; }
+  .tr-ob-screen.on { display: flex; }
+  .tr-ob-top { display: flex; align-items: center; gap: 12px; height: 34px; flex: none; }
+  .tr-ob-back { background: none; border: none; font-size: 24px; line-height: 1;
+    color: var(--chocolat-muted); cursor: pointer; padding: 0; width: 22px; }
+  .tr-ob-bars { display: flex; gap: 6px; flex: 1; }
+  .tr-ob-bar { flex: 1; height: 4px; border-radius: 2px; background: #E3D8CD; cursor: pointer; transition: background 0.25s; }
+  .tr-ob-bar.done { background: var(--corail); }
+  .tr-ob-bar.now { background: var(--bordeaux); }
+  .tr-ob-skip { background: none; border: none; font-size: 13px; color: var(--chocolat-muted);
+    letter-spacing: 0.04em; cursor: pointer; font-family: 'Jost', sans-serif; }
+  .tr-ob-hero { border-radius: 22px; overflow: hidden; height: 208px; margin-top: 16px; flex: none; }
+  .tr-ob-hero img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 28%; display: block; }
+  .tr-ob-h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 32px;
+    line-height: 1.12; color: var(--chocolat); margin: 22px 0 0; }
+  .tr-ob-lead { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 19px;
+    color: var(--bordeaux); margin: 8px 0 0; }
+  .tr-ob-body { font-size: 14.5px; font-weight: 300; line-height: 1.6; color: var(--chocolat-mid); margin: 14px 0 0; }
+  .tr-ob-note { font-size: 13px; font-weight: 300; line-height: 1.55; color: var(--chocolat-muted); margin: 14px 0 0; }
+  .tr-ob-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .tr-ob-tag { font-size: 12.5px; padding: 6px 14px; border-radius: 100px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--chocolat-mid); }
+  .tr-ob-times { display: flex; gap: 10px; margin-top: 20px; }
+  .tr-ob-time { flex: 1; text-align: center; background: var(--surface);
+    border: 1px solid var(--border-light); border-radius: 16px; padding: 14px 8px; }
+  .tr-ob-time .ic { font-size: 22px; }
+  .tr-ob-time .lb { font-size: 13px; color: var(--chocolat); margin-top: 4px; }
+  .tr-ob-score { display: flex; gap: 12px; margin-top: 18px; }
+  .tr-ob-pts { flex: 1; background: var(--bordeaux-pale); border: 1px solid var(--bordeaux-line);
+    border-radius: 16px; padding: 14px; text-align: center; }
+  .tr-ob-pts .n { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: var(--bordeaux); line-height: 1; }
+  .tr-ob-pts .d { font-size: 12px; color: var(--chocolat-mid); margin-top: 5px; }
+  .tr-ob-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 16px;
+    padding: 15px 16px; margin-top: 12px; box-shadow: var(--shadow); }
+  .tr-ob-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 600; color: var(--chocolat); margin: 0 0 4px; }
+  .tr-ob-card p { font-size: 13px; font-weight: 300; line-height: 1.55; color: var(--chocolat-mid); margin: 0; }
+  .tr-ob-levels { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .tr-ob-lvl { font-size: 11.5px; padding: 5px 11px; border-radius: 100px; background: var(--surface2);
+    color: var(--chocolat-muted); border: 1px solid var(--border-light); }
+  .tr-ob-lvl.first { background: var(--bordeaux); color: #fff; border-color: var(--bordeaux); }
+  .tr-ob-spacer { flex: 1; min-height: 18px; }
+  .tr-ob-cta { width: 100%; border: none; background: var(--bordeaux); color: var(--bg);
+    font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 400; letter-spacing: 0.03em;
+    padding: 16px 0; border-radius: 15px; cursor: pointer; margin-top: 14px; }
+  .tr-ob-cta:active { background: #7A3131; }
+  @media (min-width: 600px) {
+    #teamOb.on { display: flex; align-items: center; justify-content: center; padding: 28px 16px; background: #EDE6DC; }
+    .tr-ob-screen { min-height: 0; height: 760px; max-height: calc(100dvh - 56px); width: 420px;
+      background: var(--bg); border-radius: 32px; box-shadow: 0 22px 50px -24px rgba(44,24,16,0.35); overflow-y: auto; }
+  }
 </style>
 </head>
 <body>
@@ -311,8 +369,83 @@
     <div class="logo-mark"><img src="rosy_avatar.webp" alt="Rosy"></div>
     <div class="logo-text">LA <span>TEAM</span></div>
   </div>
-  <a class="back-link" href="index.html">← Rosy</a>
+  <div class="header-actions">
+    <button class="rules-link" onclick="trObOuvrir()">Règles</button>
+    <a class="back-link" href="index.html">← Rosy</a>
+  </div>
 </header>
+
+<div id="teamOb">
+
+  <div class="tr-ob-screen" id="trOb1">
+    <div class="tr-ob-top">
+      <div class="tr-ob-bars">
+        <span class="tr-ob-bar now" onclick="trObGo(1)"></span>
+        <span class="tr-ob-bar" onclick="trObGo(2)"></span>
+        <span class="tr-ob-bar" onclick="trObGo(3)"></span>
+      </div>
+      <button class="tr-ob-skip" onclick="trObFin()">Passer</button>
+    </div>
+    <div class="tr-ob-hero"><img src="ecran_team.webp" alt="" onerror="this.parentNode.style.display='none'"></div>
+    <h1 class="tr-ob-h1">Cinq carnations, une équipe</h1>
+    <p class="tr-ob-lead">Deviens la copine qui s’y connaît.</p>
+    <p class="tr-ob-body">LA TEAM, c’est ton jeu quotidien sur la beauté des peaux noires et métissées. Chaque jour, une amie et un moment de sa vie : tu l’aides, et tu repars avec un geste d’experte.</p>
+    <div class="tr-ob-tags">
+      <span class="tr-ob-tag">Sous-tons</span><span class="tr-ob-tag">Carnations</span><span class="tr-ob-tag">Flashback</span><span class="tr-ob-tag">Finis</span><span class="tr-ob-tag">Poudres</span>
+    </div>
+    <div class="tr-ob-spacer"></div>
+    <button class="tr-ob-cta" onclick="trObGo(2)">Suivant</button>
+  </div>
+
+  <div class="tr-ob-screen" id="trOb2">
+    <div class="tr-ob-top">
+      <button class="tr-ob-back" onclick="trObGo(1)">‹</button>
+      <div class="tr-ob-bars">
+        <span class="tr-ob-bar done" onclick="trObGo(1)"></span>
+        <span class="tr-ob-bar now" onclick="trObGo(2)"></span>
+        <span class="tr-ob-bar" onclick="trObGo(3)"></span>
+      </div>
+      <button class="tr-ob-skip" onclick="trObFin()">Passer</button>
+    </div>
+    <h1 class="tr-ob-h1">Comment on joue</h1>
+    <div class="tr-ob-times">
+      <div class="tr-ob-time"><div class="ic">🌅</div><div class="lb">Matin</div></div>
+      <div class="tr-ob-time"><div class="ic">☀️</div><div class="lb">Midi</div></div>
+      <div class="tr-ob-time"><div class="ic">🌙</div><div class="lb">Soir</div></div>
+    </div>
+    <p class="tr-ob-body">Une mission par jour, en trois manches. Pas dispo à l’heure dite ? Tout se rattrape jusqu’à minuit, heure de Paris.</p>
+    <p class="tr-ob-note">À minuit, la mission change. Ta progression, elle, reste acquise.</p>
+    <div class="tr-ob-score">
+      <div class="tr-ob-pts"><div class="n">+50</div><div class="d">bonne réponse</div></div>
+      <div class="tr-ob-pts"><div class="n">+15</div><div class="d">même si c’est faux</div></div>
+    </div>
+    <p class="tr-ob-note">Jouer compte toujours. Une manche parfaite et une mission complète ajoutent des bonus.</p>
+    <div class="tr-ob-spacer"></div>
+    <button class="tr-ob-cta" onclick="trObGo(3)">Suivant</button>
+  </div>
+
+  <div class="tr-ob-screen" id="trOb3">
+    <div class="tr-ob-top">
+      <button class="tr-ob-back" onclick="trObGo(2)">‹</button>
+      <div class="tr-ob-bars">
+        <span class="tr-ob-bar done" onclick="trObGo(1)"></span>
+        <span class="tr-ob-bar done" onclick="trObGo(2)"></span>
+        <span class="tr-ob-bar now" onclick="trObGo(3)"></span>
+      </div>
+    </div>
+    <h1 class="tr-ob-h1">Ce que tu fais grandir</h1>
+    <div class="tr-ob-card"><h3>Ta série</h3><p>Les jours d’affilée où tu as joué. Une erreur ne la casse pas — seule ton absence compte.</p></div>
+    <div class="tr-ob-card"><h3>Tes Perles</h3><p>Tu les gagnes en jouant, jamais en euros. Elles servent à te personnaliser et à débloquer des bonus de jeu.</p></div>
+    <div class="tr-ob-card"><h3>Tes niveaux</h3><p>Tu progresses au fil de tes missions.</p>
+      <div class="tr-ob-levels">
+        <span class="tr-ob-lvl first">Apprentie · tu commences ici</span><span class="tr-ob-lvl">Initiée</span><span class="tr-ob-lvl">Connaisseuse</span><span class="tr-ob-lvl">Experte Teint</span>
+      </div>
+    </div>
+    <div class="tr-ob-spacer"></div>
+    <button class="tr-ob-cta" onclick="trObFin()">Commencer à jouer</button>
+  </div>
+
+</div>
 
 <main>
   <!-- Chargement initial -->
@@ -719,6 +852,28 @@
 
   /* ================= Démarrage ================= */
   initialiser();
+</script>
+<script>
+  /* ===== Onboarding LA TEAM (parcours 3 volets) ===== */
+  var TR_OB_KEY = 'rosy_team_rules_v1';
+  function trObGo(n){
+    for(var i=1;i<=3;i++){
+      var s=document.getElementById('trOb'+i);
+      if(s){ s.classList.toggle('on', i===n); if(i===n) s.scrollTop=0; }
+    }
+    var ob=document.getElementById('teamOb');
+    if(ob){ ob.classList.add('on'); ob.scrollTop=0; }
+  }
+  function trObOuvrir(){ trObGo(1); }
+  function trObFin(){
+    var ob=document.getElementById('teamOb'); if(ob) ob.classList.remove('on');
+    for(var i=1;i<=3;i++){ var s=document.getElementById('trOb'+i); if(s) s.classList.remove('on'); }
+    try{ localStorage.setItem(TR_OB_KEY,'1'); }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var seen=false; try{ seen = localStorage.getItem(TR_OB_KEY)==='1'; }catch(e){}
+    if(!seen){ trObGo(1); }
+  });
 </script>
 </body>
 </html>
