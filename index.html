@@ -520,10 +520,10 @@
 
 
   /* ===== Guide d'accueil écran Beauté (écran unique, 1re visite) ===== */
-  #beauteGuide { position: fixed; inset: 0; background: var(--bg); z-index: 90; display: none; }
+  #beauteGuide { position: fixed; inset: 0; background: var(--bg); z-index: 90; display: none; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   #beauteGuide.on { display: block; }
   .bgd-card { display: flex; flex-direction: column; min-height: 100dvh; max-width: 460px;
-    margin: 0 auto; padding: 16px 22px 26px; box-sizing: border-box; overflow-y: auto; }
+    margin: 0 auto; padding: 16px 22px 40px; box-sizing: border-box; }
   .bgd-top { display: flex; align-items: center; justify-content: space-between; height: 30px; flex: none; }
   .bgd-skip { background: none; border: none; font-size: 13px; color: var(--chocolat-muted);
     cursor: pointer; font-family: 'Jost', sans-serif; letter-spacing: 0.04em; }
@@ -551,7 +551,7 @@
   @media (min-width: 600px) {
     #beauteGuide.on { display: flex; align-items: center; justify-content: center; padding: 28px 16px; background: #EDE6DC; }
     .bgd-card { min-height: 0; max-height: calc(100dvh - 56px); width: 420px; background: var(--bg);
-      border-radius: 32px; box-shadow: 0 22px 50px -24px rgba(44,24,16,0.35); }
+      border-radius: 32px; box-shadow: 0 22px 50px -24px rgba(44,24,16,0.35); overflow-y: auto; }
   }
 </style>
 <style>
