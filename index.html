@@ -553,6 +553,14 @@
     .bgd-card { min-height: 0; max-height: calc(100dvh - 56px); width: 420px; background: var(--bg);
       border-radius: 32px; box-shadow: 0 22px 50px -24px rgba(44,24,16,0.35); overflow-y: auto; }
   }
+
+  .bt-theme-group { margin-bottom: 18px; }
+  .bt-theme-label { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color: var(--chocolat, #5A3520); margin: 4px 2px 8px; letter-spacing:.3px; }
+  .bt-del, .bt-del-tr { border:none; background:rgba(0,0,0,.06); cursor:pointer; border-radius:8px; padding:4px 7px; font-size:14px; line-height:1; opacity:.65; transition:opacity .15s; }
+  .bt-del:hover, .bt-del-tr:hover { opacity:1; background:rgba(180,40,40,.14); }
+  .bt-del-tr { position:absolute; top:10px; right:10px; z-index:3; }
+  .bt-prod { position:relative; }
+  .bt-del { margin-left:8px; flex:0 0 auto; }
 </style>
 <style>
   /* ─── ONBOARDING (écrans 2-6) ─────────────────────────────────────────── */
@@ -741,7 +749,7 @@
     <div class="welcome-screen" id="welcomeMsg">
       <img class="crown" src="rosy_avatar.webp" alt="Rosy">
       <h3>Hello <em>toi</em></h3>
-      <p>Je suis Rosy, ta conseillère beauté dédiée aux peaux noires et métissées. Teint, fond de teint, poudres, sous-tons — pose ta question, ou envoie une photo pour une analyse.</p>
+      <p>Alors, on parle teint, routine beauté aujourd'hui ? Pose ta question ou envoie une photo.</p>
       <div class="divider"></div>
       <div class="suggestions">
         <div class="chip" onclick="sendSuggestion('Comment trouver mon sous-ton ?')">Comment trouver mon sous-ton ? 🎨</div>
@@ -1485,27 +1493,33 @@
     if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · validé au scan') : '';
     if(c) c.innerHTML = (d.tags||[]).map(function(t){return "<span class='bt-chip'>"+esc(t)+"</span>";}).join('');
   };
-  window.renderTrousses = function(list){
+  window.renderTrousses = function(themes){
     var host=document.getElementById('btKits'); if(!host) return;
-    if(!list || !list.length){ host.innerHTML="<div class='bt-empty' style='display:block'>Tes trousses apparaîtront ici. Demande à Rosy d'en créer une.</div>"; return; }
+    if(!themes || !themes.length){ host.innerHTML="<div class='bt-empty' style='display:block'>Tes trousses appara\u00eetront ici. Demande \u00e0 Rosy d'en cr\u00e9er une.</div>"; return; }
     var out='';
-    for(var i=0;i<list.length;i++){
-      var t=list[i], cls=themeClass(t.theme), arr=t.produits||[], prods='';
-      for(var j=0;j<arr.length;j++){
-        var p=arr[j];
-        var thumb = p.image_url ? "<div class='bt-thumb' style='background-image:url("+p.image_url+");background-size:cover'></div>" : "<div class='bt-thumb empty'></div>";
-        var shade = p.shade ? "<div class='bt-ps'>Teinte &middot; "+esc(p.shade)+"</div>" : "";
-        var price = p.price_eur ? "<span class='bt-price'>"+esc(p.price_eur)+"</span>" : "";
-        var cta = p.product_url ? "<a class='bt-cta' href='"+esc(p.product_url)+"' target='_blank' rel='noopener'>Voir ↗</a>" : "<span class='bt-nolink'>Hors partenaires</span>";
-        prods += "<div class='bt-prod'>"+thumb+"<div class='bt-pinfo'><div class='bt-pn'>"+esc(p.name)+"</div>"+shade+price+"</div>"+cta+"</div>";
+    for(var ti=0; ti<themes.length; ti++){
+      var th=themes[ti], trousses=th.trousses||[];
+      out += "<div class='bt-theme-group'><div class='bt-theme-label'>"+esc(th.theme||'Mes essentiels')+"</div>";
+      for(var i=0;i<trousses.length;i++){
+        var t=trousses[i], cls=themeClass(t.theme), arr=t.produits||[], prods='';
+        for(var j=0;j<arr.length;j++){
+          var p=arr[j];
+          var thumb = p.image_url ? "<div class='bt-thumb' style='background-image:url("+p.image_url+");background-size:cover'></div>" : "<div class='bt-thumb empty'></div>";
+          var shade = p.shade ? "<div class='bt-ps'>Teinte &middot; "+esc(p.shade)+"</div>" : "";
+          var price = p.price_eur ? "<span class='bt-price'>"+esc(p.price_eur)+"</span>" : "";
+          var cta = p.product_url ? "<a class='bt-cta' href='"+esc(p.product_url)+"' target='_blank' rel='noopener'>Voir \u2197</a>" : "<span class='bt-nolink'>Hors partenaires</span>";
+          var delp = t.trousse_id ? "<button class='bt-del' data-act='rmprod' data-tid='"+esc(t.trousse_id)+"' data-pid='"+esc(p.product_id||'')+"' title='Retirer ce produit'>\ud83d\uddd1</button>" : "";
+          prods += "<div class='bt-prod'>"+thumb+"<div class='bt-pinfo'><div class='bt-pn'>"+esc(p.name)+"</div>"+shade+price+"</div>"+cta+delp+"</div>";
+        }
+        if(!prods) prods="<div class='bt-prod'><div class='bt-pinfo'><div class='bt-pn'>Trousse vide</div></div></div>";
+        var veil = (cls==='essentiels') ? "" : "<div class='bt-veil2'></div>";
+        var delt = t.trousse_id ? "<button class='bt-del-tr' data-act='rmtr' data-tid='"+esc(t.trousse_id)+"' title='Supprimer la trousse'>\ud83d\uddd1</button>" : "";
+        out += "<div class='bt-kit "+cls+(i===0?" open":"")+"' data-theme='"+cls+"'>"
+            + "<div class='bt-head'><div class='bt-ph'></div>"+veil+delt
+            + "<div class='bt-tx'><div class='bt-title'>"+esc(t.nom)+"</div><div class='bt-meta'>"+esc(t.meta)+"</div></div></div>"
+            + "<div class='bt-detail'>"+prods+"</div></div>";
       }
-      if(!prods) prods="<div class='bt-prod'><div class='bt-pinfo'><div class='bt-pn'>Trousse vide</div></div></div>";
-      var cat = t.theme ? "<span class='bt-cat'>"+esc(t.theme)+"</span>" : "";
-      var veil = (cls==='essentiels') ? "" : "<div class='bt-veil2'></div>";
-      out += "<div class='bt-kit "+cls+(i===0?" open":"")+"' data-theme='"+cls+"'>"
-          + "<div class='bt-head'><div class='bt-ph'></div>"+veil+cat
-          + "<div class='bt-tx'><div class='bt-title'>"+esc(t.nom)+"</div><div class='bt-meta'>"+esc(t.meta)+"</div></div></div>"
-          + "<div class='bt-detail'>"+prods+"</div></div>";
+      out += "</div>";
     }
     host.innerHTML=out;
   };
@@ -1516,9 +1530,35 @@
       var email=(typeof userEmail!=='undefined'&&userEmail)?userEmail:(window.__email||'');
       var r=await fetch(MANAGE_CART_URL+'?email='+encodeURIComponent(email),{headers:{'Authorization':'Bearer '+getSession()}});
       var data=await r.json();
-      renderTrousses((data&&data.trousses)||[]);
+      renderTrousses((data&&data.themes)||themesFromTrousses(data&&data.trousses)||[]);
     }catch(e){ host.innerHTML="<div class='bt-empty' style='display:block'>Tes trousses apparaîtront ici.</div>"; }
   };
+
+  function themesFromTrousses(list){
+    if(!list || !list.length) return null;
+    var idx={}, order=[];
+    list.forEach(function(t){ var th=t.theme||'Mes essentiels'; if(!idx[th]){ idx[th]={theme:th,trousses:[]}; order.push(th); } idx[th].trousses.push(t); });
+    return order.map(function(th){return idx[th];});
+  }
+  (function(){
+    var host=document.getElementById('btKits'); if(!host) return;
+    host.addEventListener('click', async function(ev){
+      var btn=ev.target.closest('[data-act]'); if(!btn) return;
+      ev.preventDefault(); ev.stopPropagation();
+      var act=btn.getAttribute('data-act'), tid=btn.getAttribute('data-tid'), pid=btn.getAttribute('data-pid');
+      var email=(typeof userEmail!=='undefined'&&userEmail)?userEmail:(window.__email||'');
+      var url, body;
+      if(act==='rmprod'){ if(!confirm('Retirer ce produit de la trousse ?')) return; url=MANAGE_CART_URL+'/remove-product'; body={email:email, product_id:pid, trousse_id:tid}; }
+      else if(act==='rmtr'){ if(!confirm('Supprimer cette trousse et tous ses produits ?')) return; url=MANAGE_CART_URL+'/remove-trousse'; body={email:email, trousse_id:tid}; }
+      else { return; }
+      btn.disabled=true;
+      try{
+        var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getSession()},body:JSON.stringify(body)});
+        var data=await r.json();
+        if(r.ok){ renderTrousses(data.themes||[]); } else { alert(data.error||'Suppression impossible.'); btn.disabled=false; }
+      }catch(e){ alert('Erreur r\u00e9seau.'); btn.disabled=false; }
+    });
+  })();
   // ouverture/fermeture d'une trousse (délégation, cartes rendues dynamiquement)
   document.addEventListener('click', function(e){
     var head = e.target.closest ? e.target.closest('.bt-head') : null;
