@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rosy</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
     /* Palette éditorial boudoir */
@@ -1076,17 +1075,36 @@
 
   // ─── GOOGLE SIGN-IN ───────────────────────────────────────────────────────
   function initGoogleButton() {
-    if (!(window.google && google.accounts && google.accounts.id)) {
-      setTimeout(initGoogleButton, 300); // la librairie GIS charge en async
-      return;
-    }
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: onGoogleCredential
-    });
-    google.accounts.id.renderButton(document.getElementById('googleBtn'), {
-      theme: 'outline', size: 'large', text: 'signin_with',
-      locale: 'fr', width: 320
+    var slot = document.getElementById('googleBtn');
+    if (!slot) return;
+
+    // Plugin natif dispo uniquement dans l'app (Capacitor). Sur le web classique, on masque.
+    var SL = (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.SocialLogin) || null;
+    if (!SL) { slot.style.display = 'none'; return; }
+
+    // Construit un bouton simple "Continuer avec Google"
+    slot.innerHTML =
+      '<button type="button" class="btn-primary" id="googleNativeBtn" ' +
+      'style="width:100%;background:#fff;color:#3c4043;border:1px solid #dadce0">' +
+      'Continuer avec Google</button>';
+
+    var initialized = false;
+    document.getElementById('googleNativeBtn').addEventListener('click', async function () {
+      try {
+        if (!initialized) {
+          await SL.initialize({ google: { webClientId: GOOGLE_CLIENT_ID } });
+          initialized = true;
+        }
+        var res = await SL.login({ provider: 'google', options: { scopes: ['email', 'profile'] } });
+        var idToken = res && res.result && res.result.idToken;
+        if (idToken) {
+          await onGoogleCredential({ credential: idToken });
+        } else {
+          showGateError('Connexion Google interrompue.');
+        }
+      } catch (e) {
+        showGateError('Connexion Google impossible. Réessaie.');
+      }
     });
   }
 
