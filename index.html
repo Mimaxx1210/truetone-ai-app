@@ -730,7 +730,18 @@
       <div class="google-slot" id="googleBtn"></div>
       <div class="gate-sep">ou</div>
       <input class="input-field" type="email" id="emailInput" placeholder="ton@email.com" autocomplete="email" />
-      <button class="btn-primary" id="magicBtn" onclick="requestMagicLink()">Recevoir mon lien de connexion</button>
+      <button class="btn-primary" id="otpRequestBtn" onclick="requestOtp()">Recevoir mon code de connexion</button>
+
+      <div id="otpStep2" style="display:none; margin-top:14px">
+        <input class="input-field" type="text" id="otpCodeInput" inputmode="numeric"
+               autocomplete="one-time-code" maxlength="6" placeholder="Code à 6 chiffres"
+               style="text-align:center; letter-spacing:0.4em; font-size:18px" />
+        <button class="btn-primary" id="otpVerifyBtn" onclick="verifyOtp()">Me connecter</button>
+        <p style="margin-top:12px; font-size:13px">
+          <a href="#" onclick="requestOtp(); return false;"
+             style="color:var(--bordeaux); text-decoration:underline">Renvoyer un code</a>
+        </p>
+      </div>
     </div>
 
     <p class="gate-error" id="gateError"></p>
@@ -1151,9 +1162,66 @@
     btn.disabled = false;
   }
 
+  // ─── OTP (code à 6 chiffres par email) ────────────────────────────────────
+  function requestOtp() {
+    const email = document.getElementById('emailInput').value.trim().toLowerCase().replace(/\s+/g, '');
+    document.getElementById('gateError').style.display = 'none';
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      showGateError("Merci d'entrer un email valide.");
+      return;
+    }
+    const btn = document.getElementById('otpRequestBtn');
+    btn.disabled = true;
+    fetch(AUTH_BASE + '/otp/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    }).then(function () {
+      document.getElementById('otpStep2').style.display = 'block';
+      showGateInfo('Un code à 6 chiffres vient de partir vers ton adresse. Vérifie ta boîte (et tes spams) — il est valable 15 minutes.');
+      document.getElementById('otpCodeInput').focus();
+    }).catch(function () {
+      showGateError('Envoi impossible pour le moment. Réessaie.');
+    }).finally(function () {
+      btn.disabled = false;
+    });
+  }
+
+  async function verifyOtp() {
+    const email = document.getElementById('emailInput').value.trim().toLowerCase().replace(/\s+/g, '');
+    const code = document.getElementById('otpCodeInput').value.trim();
+    document.getElementById('gateError').style.display = 'none';
+    if (!code) {
+      showGateError('Saisis le code reçu par email.');
+      return;
+    }
+    const btn = document.getElementById('otpVerifyBtn');
+    btn.disabled = true;
+    try {
+      const r = await fetch(AUTH_BASE + '/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, code: code })
+      });
+      const d = await r.json();
+      if (r.ok && d.token) {
+        setSession(d.token);
+        entrerApp(d.email, d.onboarding_done);
+        return;
+      }
+      showGateError(d.error || 'Code invalide ou expiré.');
+    } catch (e) {
+      showGateError('Connexion impossible pour le moment. Réessaie.');
+    }
+    btn.disabled = false;
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('emailInput').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') requestMagicLink();
+      if (e.key === 'Enter') requestOtp();
+    });
+    document.getElementById('otpCodeInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') verifyOtp();
     });
     initAuth();
   });
