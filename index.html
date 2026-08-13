@@ -1558,7 +1558,7 @@
     try{
       var r = await fetch(PROFIL_URL+'?email='+encodeURIComponent(currentEmail()), { headers:{ 'Authorization':'Bearer '+getSession() } });
       var d = await r.json();
-      if(d && d.carnation){ setCarnation({ carnation: CARN_LABEL[d.carnation]||d.carnation, undertone: UT_LABEL[d.undertone]||d.undertone, tags:[] }); }
+      if(d && d.carnation){ setCarnation({ carnation: d.carnation, undertone: UT_LABEL[d.undertone]||d.undertone, source: d.carnation_source, tags:[] }); }
       else { setCarnation(null); }
       if(d){ setTier(d.plan==='signature' ? 'signature' : 'decouverte'); }
     }catch(e){ setCarnation(null); }
@@ -1576,7 +1576,7 @@
     var n=document.getElementById('btCarn'), s=document.getElementById('btCarnSub'), c=document.getElementById('btCarnChips'), img=document.getElementById('btCarnImg');
     if(img){ img.src = (d && d.carnation && CARN_IMG[d.carnation]) ? CARN_IMG[d.carnation] : 'ecran5_portrait.webp'; }
     if(!d){ if(n)n.textContent='Ta carnation'; if(s)s.textContent='Scanne ta peau avec Rosy pour la révéler'; if(c)c.innerHTML=''; return; }
-    if(n) n.textContent = d.carnation ? ('Carnation '+CARN_LABEL[d.carnation]||d.carnation) : 'Ta carnation';
+    if(n) n.textContent = d.carnation ? ('Carnation '+(CARN_LABEL[d.carnation]||d.carnation)) : 'Ta carnation';
     if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · ' + (d.carnation_source === 'declaration' ? 'déclaré' : 'validé au scan')) : '';
     if(c) c.innerHTML = (d.tags||[]).map(function(t){return "<span class='bt-chip'>"+esc(t)+"</span>";}).join('');
   };
