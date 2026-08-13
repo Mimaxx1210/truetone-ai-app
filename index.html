@@ -785,7 +785,7 @@
     </div>
 
     <!-- FILE INPUT CACHÉ -->
-    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelected(event)">
+    <input type="file" id="fileInput" accept="image/*" capture="user" onchange="handleFileSelected(event)">
 
     <div class="input-row">
       <!-- BOUTON SCAN -->
@@ -812,7 +812,7 @@
     <span class="bt-guide-link" onclick="ouvrirGuideBeaute()">Comment ça marche ?</span>
     <div class="bt-sect">Ta carnation</div>
     <div class="bt-carn">
-      <img src="ecran5_portrait.webp" alt="" onerror="this.style.display='none'">
+      <img id="btCarnImg" src="ecran5_portrait.webp" alt="" onerror="this.src='ecran5_portrait.webp'">
       <div class="bt-veil"></div>
       <div class="bt-overlay">
         <div class="bt-cname" id="btCarn">Ta carnation</div>
@@ -1526,7 +1526,7 @@
     });
     var rb = document.getElementById('resetBtn');
     if (rb) rb.style.display = (name === 'rosy') ? '' : 'none';
-    if (name === 'beaute') { loadProfil(); if (!window.__beauteLoaded) { window.__beauteLoaded = true; loadBeaute(); } }
+    if (name === 'beaute') { loadProfil(); loadBeaute(); }
     if (name === 'profil') { populateProfil(); loadProfil(); }
     if (name === 'rosy') { var mi = document.getElementById('msgInput'); if (mi) mi.focus(); }
   }
@@ -1571,11 +1571,13 @@
     if(!list || !list.length){ u.innerHTML="<div class='bt-teaser'>Aucune routine enregistrée. Demande à Rosy d'en créer une.</div>"; return; }
     u.innerHTML = list.map(function(rt){ var n=(rt.produits||[]).length; return "<div class='bt-prow'><span class='bt-k'>"+esc(rt.nom)+"</span><span class='bt-v'>"+n+" produit"+(n>1?"s":"")+"</span></div>"; }).join('');
   };
+  var CARN_IMG = { ebene:'carnation_ebene.webp', cacao:'carnation_cacao.webp', caramel:'carnation_caramel.webp', miel:'carnation_miel.webp', beige_dore:'carnation_beige_dore.webp' };
   window.setCarnation = function(d){
-    var n=document.getElementById('btCarn'), s=document.getElementById('btCarnSub'), c=document.getElementById('btCarnChips');
+    var n=document.getElementById('btCarn'), s=document.getElementById('btCarnSub'), c=document.getElementById('btCarnChips'), img=document.getElementById('btCarnImg');
+    if(img){ img.src = (d && d.carnation && CARN_IMG[d.carnation]) ? CARN_IMG[d.carnation] : 'ecran5_portrait.webp'; }
     if(!d){ if(n)n.textContent='Ta carnation'; if(s)s.textContent='Scanne ta peau avec Rosy pour la révéler'; if(c)c.innerHTML=''; return; }
-    if(n) n.textContent = d.carnation ? ('Carnation '+d.carnation) : 'Ta carnation';
-    if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · validé au scan') : '';
+    if(n) n.textContent = d.carnation ? ('Carnation '+CARN_LABEL[d.carnation]||d.carnation) : 'Ta carnation';
+    if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · ' + (d.carnation_source === 'declaration' ? 'déclaré' : 'validé au scan')) : '';
     if(c) c.innerHTML = (d.tags||[]).map(function(t){return "<span class='bt-chip'>"+esc(t)+"</span>";}).join('');
   };
   window.renderTrousses = function(themes){
