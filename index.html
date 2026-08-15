@@ -1462,11 +1462,20 @@
 
       // Message visible côté utilisatrice avec le résultat
       const confLabels = { high: 'élevée', medium: 'moyenne', low: 'faible' };
-      const analysisMsg = `Mon analyse photo 📸 : carnation **${data.carnation}**, sous-ton **${data.undertone}** (confiance : ${confLabels[data.confidence] || data.confidence})`;
+      const posture = data.posture || 'assuree';
+      let analysisMsg = `Mon analyse photo 📸 : carnation **${data.carnation}**, sous-ton **${data.undertone}** (confiance : ${confLabels[data.confidence] || data.confidence})`;
+      if (posture === 'moyenne' && data.carnation_alternative) {
+        analysisMsg += ` — j'hésite entre **${data.carnation}** et **${data.carnation_alternative}**, la frontière est fine. Peux-tu m'aider à confirmer ?`;
+      }
+      if (posture === 'departage') {
+        analysisMsg += ` — le scan n'est pas assez sûr (lumière ou photo). Pose-moi des questions pour départager avant de me suggérer des produits.`;
+      }
 
       // Mise à jour du message "en cours" avec le résultat réel
       pendingMsg.querySelector('.msg-bubble').innerHTML = formatMessage(analysisMsg);
-      persistCarnation(data.carnation, data.undertone);
+      if (posture !== 'departage') {
+        persistCarnation(data.carnation, data.undertone, posture === 'assuree' ? 'validee' : 'estimee');
+      }
 
       // Envoi à Rosy
       const sendRes = await fetch(API_URL, {
@@ -1558,13 +1567,13 @@
     try{
       var r = await fetch(PROFIL_URL+'?email='+encodeURIComponent(currentEmail()), { headers:{ 'Authorization':'Bearer '+getSession() } });
       var d = await r.json();
-      if(d && d.carnation){ setCarnation({ carnation: d.carnation, undertone: UT_LABEL[d.undertone]||d.undertone, source: d.carnation_source, tags:[] }); }
+      if(d && d.carnation){ setCarnation({ carnation: d.carnation, undertone: UT_LABEL[d.undertone]||d.undertone, carnation_source: d.carnation_source, carnation_statut: d.carnation_statut, tags:[] }); }
       else { setCarnation(null); }
       if(d){ setTier(d.plan==='signature' ? 'signature' : 'decouverte'); }
     }catch(e){ setCarnation(null); }
   };
-  window.persistCarnation = async function(carnation, undertone){
-    try{ await fetch(CARNATION_URL, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+getSession() }, body: JSON.stringify({ email: currentEmail(), carnation: carnation, undertone: undertone }) }); }catch(e){}
+  window.persistCarnation = async function(carnation, undertone, statut){
+    try{ await fetch(CARNATION_URL, { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+getSession() }, body: JSON.stringify({ email: currentEmail(), carnation: carnation, undertone: undertone, statut: statut || 'validee' }) }); }catch(e){}
   };
   window.renderRoutines = function(list){
     var u=document.getElementById('btUnlocked'); if(!u) return;
@@ -1577,7 +1586,7 @@
     if(img){ img.src = (d && d.carnation && CARN_IMG[d.carnation]) ? CARN_IMG[d.carnation] : 'ecran5_portrait.webp'; }
     if(!d){ if(n)n.textContent='Ta carnation'; if(s)s.textContent='Scanne ta peau avec Rosy pour la révéler'; if(c)c.innerHTML=''; return; }
     if(n) n.textContent = d.carnation ? ('Carnation '+(CARN_LABEL[d.carnation]||d.carnation)) : 'Ta carnation';
-    if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · ' + (d.carnation_source === 'declaration' ? 'déclaré' : 'validé au scan')) : '';
+    if(s) s.textContent = d.undertone ? ('Sous-ton '+d.undertone+' · ' + (d.carnation_source === 'declaration' ? 'déclaré' : (d.carnation_statut === 'estimee' ? 'estimé au scan' : 'validé au scan'))) : '';
     if(c) c.innerHTML = (d.tags||[]).map(function(t){return "<span class='bt-chip'>"+esc(t)+"</span>";}).join('');
   };
   window.renderTrousses = function(themes){
