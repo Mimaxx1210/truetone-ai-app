@@ -1462,13 +1462,19 @@
 
       // Message visible côté utilisatrice avec le résultat
       const confLabels = { high: 'élevée', medium: 'moyenne', low: 'faible' };
+      const CARN_TXT = { ebene:'Ébène', cacao:'Cacao', caramel:'Caramel', miel:'Miel', beige_dore:'Beige Doré' };
+      const UT_TXT = { warm:'chaud', cool:'froid', neutral:'neutre' };
       const posture = data.posture || 'assuree';
-      let analysisMsg = `Mon analyse photo 📸 : carnation **${data.carnation}**, sous-ton **${data.undertone}** (confiance : ${confLabels[data.confidence] || data.confidence})`;
-      if (posture === 'moyenne' && data.carnation_alternative) {
-        analysisMsg += ` — j'hésite entre **${data.carnation}** et **${data.carnation_alternative}**, la frontière est fine. Peux-tu m'aider à confirmer ?`;
-      }
+      const carnTxt = CARN_TXT[data.carnation] || data.carnation;
+      const utTxt = UT_TXT[data.undertone] || data.undertone;
+      let analysisMsg;
       if (posture === 'departage') {
-        analysisMsg += ` — le scan n'est pas assez sûr (lumière ou photo). Pose-moi des questions pour départager avant de me suggérer des produits.`;
+        analysisMsg = `Analyse photo 📸 — le scan n'a pas pu trancher (lumière ou photo insuffisante).`;
+      } else {
+        analysisMsg = `Analyse photo 📸 — résultat du scan : carnation **${carnTxt}**, sous-ton **${utTxt}** (confiance ${confLabels[data.confidence] || data.confidence}).`;
+        if (posture === 'moyenne' && data.carnation_alternative) {
+          analysisMsg += ` Le scan hésite avec **${CARN_TXT[data.carnation_alternative] || data.carnation_alternative}**.`;
+        }
       }
 
       // Mise à jour du message "en cours" avec le résultat réel
