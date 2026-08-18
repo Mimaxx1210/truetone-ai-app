@@ -942,6 +942,8 @@
   const ANALYZE_URL = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/analyze-skin';
   const AUTH_BASE = 'https://8linsgnquk.execute-api.us-east-1.amazonaws.com/prod/auth';
   const GOOGLE_CLIENT_ID = '214461444330-ff08g71g6d5q5jj33gh6885ljtrrsnuf.apps.googleusercontent.com';
+  const RC_API_KEY = 'goog_tkjhbiqcPtqJNwbSyaKcKIeaxoQ';
+  const RC_ENTITLEMENT = 'signature';
   const SESSION_KEY = 'rosy_session';
   let userEmail = '', sessionId = '', isLoading = false;
 
@@ -1223,7 +1225,21 @@
       if (e.key === 'Enter') verifyOtp();
     });
     initAuth();
+    initRevenueCat();
   });
+
+  // ─── REVENUECAT (facturation Google Play) ────────────────────────────────
+  function rcPlugin() {
+    return (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.PurchasesCapacitor) || null;
+  }
+
+  async function initRevenueCat() {
+    const RC = rcPlugin();
+    if (!RC) return; // plugin natif absent (web) : on ignore sans casser
+    try {
+      await RC.configure({ apiKey: RC_API_KEY });
+    } catch (e) { /* init non bloquante : le paywall gèrera l'absence d'offre */ }
+  }
 
   // ─── CHAT (inchangé) ──────────────────────────────────────────────────────
   function resetChat() {
@@ -1717,14 +1733,37 @@
     if (b) b.innerHTML = sig ? 'Signature' : 'Découverte &middot; Gratuit';
     window.__tier = t;
   };
-  window.upgradeSignature = function () { goSignature(); setTier('signature'); };
+ window.upgradeSignature = function () { goSignature(); };
   window.goDowngrade = function () {
     alert("Retour à Découverte : l'abonnement Signature est résilié ; l'accès reste actif jusqu'à la fin de la période, puis bascule sur Découverte. (Branché à l'étape paiement.)");
     setTier('decouverte');
   };
-  window.goSignature = function () {
-    // Action laissée « derrière » : paiement Stripe via le programme de facturation EEA (Google Play). À brancher.
-    alert('Abonnement Signature — le paiement (Stripe, via le programme de facturation EEE de Google Play) se branche à l\'étape suivante.');
+  window.goSignature = async function () {
+    const RC = rcPlugin();
+    if (!RC) { alert("L'abonnement n'est disponible que dans l'application Rosy installée."); return; }
+    try {
+      const offerings = await RC.getOfferings();
+      const current = offerings && offerings.current;
+      const pkg = current && current.availablePackages && current.availablePackages[0];
+      if (!pkg) { alert("Offre indisponible pour le moment. Réessaie dans un instant."); return; }
+
+      await RC.purchasePackage({ aPackage: pkg });
+
+      const info = await RC.getCustomerInfo();
+      const actif = info && info.customerInfo && info.customerInfo.entitlements
+                    && info.customerInfo.entitlements.active
+                    && info.customerInfo.entitlements.active[RC_ENTITLEMENT];
+      if (actif) {
+        setTier('signature');
+        alert('Bienvenue dans Signature ✨');
+      } else {
+        alert("Le paiement n'a pas pu être confirmé. Si tu as été débitée, l'accès s'activera sous peu.");
+      }
+    } catch (e) {
+      // Annulation utilisateur ou erreur : on ne change rien, message discret
+      if (e && (e.code === '1' || (e.message || '').toLowerCase().indexOf('cancel') >= 0)) return;
+      alert("L'achat n'a pas abouti. Réessaie dans un instant.");
+    }
   };
 
   window.populateProfil = function () {
