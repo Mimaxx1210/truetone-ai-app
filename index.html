@@ -952,7 +952,8 @@
   function setSession(t) { localStorage.setItem(SESSION_KEY, t); }
   function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
-  function logout() {
+  async function logout() {
+    try { const RC = rcPlugin(); if (RC) { await RC.logOut(); } } catch (e) { /* non bloquant */ }
     clearSession();
     window.location.reload();
   }
@@ -996,6 +997,7 @@
   let obEmail = '';
 
   function entrerApp(email, onboardingDone) {
+    rcLogIn(email); // identite RevenueCat : Google, OTP, lien magique et session silencieuse passent tous ici
     if (onboardingDone) { openChat(email); return; }
     obEmail = email;
     document.getElementById('gate').style.display = 'none';
@@ -1233,12 +1235,28 @@
     return (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.Purchases) || null;
   }
 
-  async function initRevenueCat() {
+  let rcConfigPromise = null;
+  function ensureRcConfigured() {
     const RC = rcPlugin();
-    if (!RC) return; // plugin natif absent (web) : on ignore sans casser
+    if (!RC) return Promise.resolve(null); // plugin natif absent (web) : on ignore sans casser
+    if (!rcConfigPromise) {
+      rcConfigPromise = RC.configure({ apiKey: RC_API_KEY })
+        .catch(function (e) { rcConfigPromise = null; }); // echec : re-tentera au prochain appel
+    }
+    return rcConfigPromise.then(function () { return RC; });
+  }
+
+  async function initRevenueCat() {
+    await ensureRcConfigured(); // init non bloquante : le paywall gèrera l'absence d'offre
+  }
+
+  async function rcLogIn(email) {
+    const e = (email || '').trim().toLowerCase(); // meme normalisation que le backend (cle users)
+    if (!e) return;
     try {
-      await RC.configure({ apiKey: RC_API_KEY });
-    } catch (e) { /* init non bloquante : le paywall gèrera l'absence d'offre */ }
+      const RC = await ensureRcConfigured();
+      if (RC) { await RC.logIn({ appUserID: e }); }
+    } catch (err) { /* non bloquant : l'achat re-tentera le logIn */ }
   }
 
   // ─── CHAT (inchangé) ──────────────────────────────────────────────────────
@@ -1742,6 +1760,7 @@
     const RC = rcPlugin();
     if (!RC) { alert("L'abonnement n'est disponible que dans l'application Rosy installée."); return; }
     try {
+      await rcLogIn((typeof userEmail !== 'undefined' && userEmail) || window.__email || '');
       const offerings = await RC.getOfferings();
       const current = offerings && offerings.current;
       const pkg = current && current.availablePackages && current.availablePackages[0];
