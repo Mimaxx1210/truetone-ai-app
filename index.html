@@ -912,10 +912,11 @@
     <div class="bgd-hero"><div class="bgd-glow"></div><div class="bgd-tag">Ton espace beauté</div></div>
     <h1 class="bgd-h1">Bienvenue dans ton espace beauté</h1>
     <p class="bgd-body">Rosy réunit ici tout ce qui concerne ta peau. Voici ce que tu y trouves :</p>
-    <div class="bgd-feat"><div class="bgd-ic">📷</div><div><h3>Ta carnation</h3><p>Révélée au scan, sous-ton compris.</p></div></div>
-    <div class="bgd-feat"><div class="bgd-ic">🔒</div><div><h3>Ton passeport</h3><p>Routines et produits validés, protégés par ton code personnel.</p></div></div>
+    <div class="bgd-feat"><div class="bgd-ic">📷</div><div><h3>Ta carnation</h3><p>Lance le scan : Rosy la révèle parmi les cinq — Ébène, Cacao, Caramel, Miel, Beige Doré — avec ton sous-ton. Le point de départ de tous tes bons matchs.</p></div></div>
+    <div class="bgd-feat"><div class="bgd-ic">🔒</div><div><h3>Ton passeport</h3><p>Ton dossier perso : routines, produits validés, préférences. Verrouillé par ton code, parce que ce sont <b>tes</b> données. Code oublié ? On te le renvoie.</p></div></div>
     <div class="bgd-feat"><div class="bgd-ic">💼</div><div><h3>Tes trousses</h3><p>Des kits prêts par occasion : jour, soirée, bureau, mariage…</p></div></div>
     <div class="bgd-feat"><div class="bgd-ic">💬</div><div><h3>Demande à Rosy</h3><p>Ajoute un produit ou complète ton passeport depuis le champ en bas.</p></div></div>
+    <p class="bgd-body">Plus tu échanges avec Rosy, plus ton passeport s’enrichit — et plus ses conseils tombent juste.</p>
     <div class="bgd-spacer"></div>
     <button class="bgd-cta" onclick="fermerGuideBeaute()">C’est parti</button>
   </div>
@@ -1240,7 +1241,7 @@
     const RC = rcPlugin();
     if (!RC) return Promise.resolve(null); // plugin natif absent (web) : on ignore sans casser
     if (!rcConfigPromise) {
-      rcConfigPromise = RC.configure({ apiKey: RC_API_KEY })
+      rcConfigPromise = Promise.resolve(RC.configure({ apiKey: RC_API_KEY }))
         .catch(function (e) { rcConfigPromise = null; }); // echec : re-tentera au prochain appel
     }
     return rcConfigPromise.then(function () { return RC; });
@@ -1256,7 +1257,7 @@
     try {
       const RC = await ensureRcConfigured();
       if (RC) { await RC.logIn({ appUserID: e }); }
-    } catch (err) { /* non bloquant : l'achat re-tentera le logIn */ }
+    } catch (err) { console.warn('rcLogIn', err); /* non bloquant : l'achat re-tentera le logIn */ }
   }
 
   // ─── CHAT (inchangé) ──────────────────────────────────────────────────────
@@ -1753,8 +1754,8 @@
   };
  window.upgradeSignature = function () { goSignature(); };
   window.goDowngrade = function () {
-    alert("Retour à Découverte : l'abonnement Signature est résilié ; l'accès reste actif jusqu'à la fin de la période, puis bascule sur Découverte. (Branché à l'étape paiement.)");
-    setTier('decouverte');
+    // Resiliation reelle geree par Google Play ; le plan basculera via le webhook a l'expiration.
+    window.open('https://play.google.com/store/account/subscriptions?sku=rosy_signature&package=app.truetoneai.rosy', '_blank');
   };
   window.goSignature = async function () {
     const RC = rcPlugin();
